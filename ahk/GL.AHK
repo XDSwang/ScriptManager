@@ -112,8 +112,6 @@ WinSetTransparent(
 
 
 
-
-
 ;============================================================
 ; Ctrl + ↑ 上一个
 ;============================================================
@@ -133,8 +131,6 @@ WinSetTransparent(
 {
     SwitchScript(1)
 }
-
-
 
 
 
@@ -165,6 +161,8 @@ SwitchScript(direction)
 
 
 
+        ;读取旧句柄
+
         if FileExist(hwndFile)
         {
             try
@@ -175,6 +173,8 @@ SwitchScript(direction)
         }
 
 
+
+        ;通知退出
 
         if(currentHwnd)
         {
@@ -191,9 +191,19 @@ SwitchScript(direction)
         }
 
 
-
         Sleep 300
+
+
+
+        ;删除旧句柄文件
+
+        if FileExist(hwndFile)
+        {
+            FileDelete(hwndFile)
+        }
+
     }
+
 
 
 
@@ -222,6 +232,27 @@ SwitchScript(direction)
 
 
 
+
+    ;==========================
+    ; 新脚本句柄文件
+    ;==========================
+
+    hwndFile :=
+        scriptFolder "\" scripts[current].name ".txt"
+
+
+
+    ;保险删除旧残留
+
+    if FileExist(hwndFile)
+    {
+        FileDelete(hwndFile)
+    }
+
+
+
+
+
     ;==========================
     ; 启动脚本
     ;==========================
@@ -230,14 +261,26 @@ SwitchScript(direction)
 
 
 
-    Sleep 300
+
+
+    ;==========================
+    ; 等待新句柄生成
+    ;==========================
+
+    Loop 50
+    {
+        Sleep 100
+
+        if FileExist(hwndFile)
+            break
+    }
+
+
 
 
 
     UpdateDisplay()
 }
-
-
 
 
 
@@ -298,6 +341,7 @@ UpdateDisplay()
         {
             line .= addText
         }
+
     }
 
 
@@ -310,7 +354,8 @@ UpdateDisplay()
 
 
 
-    newHeight := lineCount * lineHeight + 10
+    newHeight :=
+        lineCount * lineHeight + 10
 
 
 
@@ -320,8 +365,6 @@ UpdateDisplay()
         " NoActivate"
     )
 }
-
-
 
 
 

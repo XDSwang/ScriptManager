@@ -181,8 +181,6 @@ ReleaseShift(*)
     shiftHeld := false
 }
 
-
-
 ; ============================================================
 ; GL管理器退出通信
 ; ============================================================
@@ -193,5 +191,12 @@ OnMessage(0xB001, GL_Exit)
 
 GL_Exit(*)
 {
+    global glFile
+
+    if FileExist(glFile)
+    {
+        FileDelete(glFile)
+    }
+
     ExitApp
 }
