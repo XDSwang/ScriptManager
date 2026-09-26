@@ -137,78 +137,110 @@ Action / 公共库
 不要通过隐藏的全局变量或共享脚本变量传递状态。
 
 ### 3.5 ★ 全项目函数命名原则
-**函数名称必须表达“归属来源 + 具体功能”，归属来源必须取自实际承载函数的 `.ahk` 文件名称。**
+**函数命名必须同时解决两个问题：同级脚本之间的归属清晰，以及跨目录引用时的唯一归属清晰。**
 
-这里的“具体脚本名称”指**实际 `.ahk` 文件名（不含扩展名）**，不能把上级分类目录名当成脚本名称。
+命名层级不是简单由“文件放在哪里”决定，而要结合函数的**使用范围**确定。
 
-#### ★ 3.5.1 公共库函数/类
-公共库函数/类采用：
-
-Common_具体脚本名称_具体功能
-
-其中：
-- Common_：表示公共库能力。
-- 具体脚本名称：必须是实际 `.ahk` 文件名，不是上级目录名。
-- 具体功能：描述函数实际完成的能力。
-
-**目录名只负责分类，不参与替代实际脚本名称。**
-
-例如：
-- Lib/Common/GUI.ahk → Common_GUI_Create()
-- Lib/Common/Message.ahk → Common_Message_SendExit()
-- Lib/Common/Log.ahk → Common_Log_Error()
-- Lib/Input/InputControl.ahk → Common_InputControl_CreateGuard()
-- Lib/Action/Keyboard.ahk → **Action_Keyboard_KeyDown()**、**Action_Keyboard_KeyUp()**
-- Lib/Action/Timer.ahk → Action_Timer_Start()、Action_Timer_Stop()
-- Lib/Action/Window.ahk → Action_Window_Activate()、Action_Window_Exists()
-- Lib/File/FileControl.ahk → **File_FileControl_Exists()**、**File_FileControl_Read()**、**File_FileControl_Write()**、**File_FileControl_Delete()**
-
-> 注意：Action、File、Input 是公共库分类目录；Keyboard、Timer、Window、FileControl、InputControl 才是实际脚本名称。
-
-#### ★ 3.5.2 业务脚本函数/类
-业务脚本函数/类采用：
+#### ★ 3.5.1 同级目录内调用：脚本名称 + 功能
+当多个 `.ahk` 文件处于同一业务/模块目录，并且函数只在该目录内部相互调用时，采用：
 
 具体脚本名称_具体功能
 
 例如：
-- GL 管理脚本：GL_Main()、GL_SwitchScript()、GL_StopCurrent()
-- SHIFT 子脚本：SHIFT_Main()、SHIFT_Start()、SHIFT_Stop()
-- WQFFF 子脚本：WQFFF_Main()、WQFFF_Start()、WQFFF_Stop()
+- Business/SHIFT/Task_Process.ahk → SHIFT_Start()
+- Business/SHIFT/Task_Action.ahk → SHIFT_Down()
+- Business/WQFFF/Task_Process.ahk → WQFFF_Start()
+- GL/GL_Process.ahk → GL_LoadScripts()
 
-禁止：Main()、Start()、Stop()、Update()、Exit() 等无法表达归属的裸名称。
+重点是：**同级目录内部调用，不需要人为加入更高层级的公共库分类前缀。**
 
-#### ★ 3.5.3 目录名与脚本名必须严格区分
-目录 = 分类
-文件 = 实际脚本/模块
-函数名 = 来源 + 功能
+#### ★ 3.5.2 跨目录引用：提升为公共可引用模块命名
+当某个脚本中的函数需要被**其他目录、其他业务模块或其他独立脚本引用**时，该脚本已经具有“公共可引用模块”的性质。
 
-例如 Lib/Action/Keyboard.ahk：
-- Action 是分类目录。
-- Keyboard 是实际脚本名称。
-- 函数应体现 Keyboard 的来源。
+此时不能继续只使用简单的：
 
-因此使用 Action_Keyboard_KeyDown()，而不是 Common_Keyboard_KeyDown() 或 Keyboard_KeyDown()。
+具体脚本名称_具体功能
 
-例如 Lib/File/FileControl.ahk：
-- File 是分类目录。
-- FileControl 是实际脚本名称。
-- 因此使用 File_FileControl_Read()。
+因为调用方可能来自多个目录，容易出现同名函数、归属不明确或后续扩展冲突。
 
-#### ★ 3.5.4 核心原则
-1. 先确定实际承载函数的 `.ahk` 文件。
-2. 再确定该文件所属分类。
-3. 使用对应分类前缀 + 实际脚本名称 + 功能名称。
-4. 分类目录名不能代替实际脚本名。
-5. 不允许省略实际脚本名。
-6. 不允许人为拆分真实脚本名称。
-7. 不允许使用无法判断归属的裸函数名。
+应提升为：
 
-#### ★ 3.5.5 新增模块命名顺序
-1. 判断属于公共库还是业务脚本。
-2. 确定实际承载函数的 `.ahk` 文件。
-3. 确定该文件所属分类目录。
-4. 按上述规则命名。
-5. 同步更新公共库函数文档。
+分类_具体脚本名称_具体功能
+
+其中“分类”必须明确表示该模块所属的公共能力类别。
+
+例如 Lib 下的公共能力：
+- Lib/Common/GUI.ahk → Common_GUI_Create()
+- Lib/Common/Message.ahk → Common_Message_SendExit()
+- Lib/Common/Log.ahk → Common_Log_Error()
+- Lib/Action/Keyboard.ahk → Action_Keyboard_KeyDown()
+- Lib/Action/Timer.ahk → Action_Timer_Start()
+- Lib/Action/Window.ahk → Action_Window_Activate()
+- Lib/Input/InputControl.ahk → Input_InputControl_StartGuard()
+- Lib/File/FileControl.ahk → File_FileControl_Read()
+
+**Common、Action、Input、File 是公共能力分类；具体文件名才是实际脚本名称。**
+
+#### ★ 3.5.3 “公共库性质”与“公共库目录”不是同一个概念
+必须区分：
+
+- **公共库目录**：物理上位于 Lib 下的可复用模块。
+- **公共库性质**：函数虽然可能位于业务目录，但已经需要被其他目录/业务模块引用，因此必须具有明确、稳定、不可混淆的跨目录名称。
+
+因此，不能简单规定“只有 Lib 里的函数才需要明确归属”。
+
+真正的判断标准是：
+
+1. 只在同级目录内部使用 → 使用“脚本名称_功能”。
+2. 被其他目录/独立模块引用 → 提升为“分类_脚本名称_功能”。
+3. 跨目录引用的模块必须有稳定的归属前缀，避免调用方根据文件路径猜测来源。
+
+#### ★ 3.5.4 目录名与实际脚本名
+必须严格区分：
+
+目录 = 能力分类
+文件 = 实际脚本/模块名称
+函数 = 来源 + 功能
+
+例如：
+
+Lib/Input/InputControl.ahk
+
+- Input = 公共能力分类。
+- InputControl = 实际脚本名称。
+- Input_InputControl_StartGuard() = 完整公共函数名称。
+
+因此禁止：
+- Common_InputControl_StartGuard()
+- Input_StartGuard()
+- StartGuard()
+
+同理：
+
+Lib/Action/Keyboard.ahk
+→ Action_Keyboard_KeyDown()
+
+Lib/File/FileControl.ahk
+→ File_FileControl_Read()
+
+#### ★ 3.5.5 核心原则
+函数名必须让人不查看调用代码，也能判断函数属于哪个实际脚本/模块。
+
+命名优先级：
+1. 先判断函数是否只在同级目录内部使用。
+2. 如果是同级内部使用，采用“脚本名称_功能”。
+3. 如果需要跨目录引用，采用“分类_脚本名称_功能”。
+4. 分类必须稳定，不能根据调用方临时改变。
+5. 实际脚本名称不能省略或人为拆分。
+6. 禁止使用无法判断归属的裸函数名。
+
+#### ★ 3.5.6 新增模块命名
+新增函数时必须先确定其使用范围：
+
+- 同级内部函数：脚本名称_功能。
+- 跨目录可复用函数：分类_脚本名称_功能。
+
+如果一个原本只在同级内部使用的函数后来开始被其他目录引用，应在扩展范围时同步提升其命名层级，并检查所有调用点。
 
 ### 3.6 变量与函数命名的共同原则
 
