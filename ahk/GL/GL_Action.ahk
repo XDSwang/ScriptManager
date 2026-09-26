@@ -29,10 +29,13 @@ GL_StartFirst(glStartScripts, &glStartCurrentIndex, glStartManagerGuiState) {
 }
 
 GL_StopCurrent(glStopScripts, glStopCurrentIndex) {
-    GL_RequestExitCurrent(glStopScripts, glStopCurrentIndex, GLMessage.ExitReasonSwitch)
-
     SplitPath glStopScripts[glStopCurrentIndex].path, &glStopCurrentFileName, &glStopCurrentDir
     glStopCurrentHwndFile := glStopCurrentDir "\" glStopCurrentFileName ".txt"
+
+    if !FileExist(glStopCurrentHwndFile)
+        return
+
+    GL_RequestExitCurrent(glStopScripts, glStopCurrentIndex, GLMessage.ExitReasonSwitch)
 
     Loop {
         Sleep 50
