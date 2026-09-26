@@ -4,43 +4,52 @@
 
 #Include ../../Lib/Common/GUI.ahk
 #Include ../../Lib/Common/Message.ahk
-#Include ../../Lib/Common/Release.ahk
-#Include ../../Lib/Action/Keyboard.ahk
-#Include ../../Lib/Action/Timer.ahk
 #Include Task_Action.ahk
 #Include Task_Process.ahk
 
 myGui := GLGui.Create("W Q F 控制")
-status := myGui.AddText("w280 h25", "● 待机 | F6 开启")
+statusText := myGui.AddText("x10 y7 w280 h20 Center", "● 待机 | F6 开启")
 
 running := false
 fInterval := 100
+PressFTimer := WQFFF_PressFTimer.Bind()
 
 glFile := A_ScriptDir "\" A_ScriptName ".txt"
 WQFFF_WriteHwnd()
 
 OnMessage(0xB001, GL_Exit)
-OnExit(ReleaseWQ)
+OnExit(WQFFF_ReleaseKeys)
 
 *F6::
 {
-    global status, running
-    if running
-        return
     WQFFF_Start()
-    status.Text := "● 运行中 | W+Q 按住 | F 连按"
 }
 
 *F7::
 {
-    global status
     WQFFF_Stop()
-    status.Text := "● 待机 | F6 开启"
+}
+
+WQFFF_ReleaseKeys(*)
+{
+    global running, PressFTimer
+
+    SetTimer(PressFTimer, 0)
+    SendEvent "{w up}"
+    SendEvent "{q up}"
+    SendEvent "{f up}"
+    running := false
 }
 
 GL_Exit(*)
 {
-    WQFFF_Stop()
+    global glFile
+
+    WQFFF_ReleaseKeys()
+
+    if FileExist(glFile)
+        FileDelete(glFile)
+
     Sleep 100
     ExitApp
 }
