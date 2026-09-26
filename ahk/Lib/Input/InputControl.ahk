@@ -93,6 +93,15 @@ Input_FindNewPhysicalInput(inputFindNewPhysicalInputBaseline) {
     return false
 }
 
+; Input_WaitPhysicalRelease - 等待用户物理输入全部释放；用于脚本退出前的安全交接。
+Input_WaitPhysicalRelease() {
+    while Input_CapturePhysicalKeys().Count > 0
+        Sleep 20
+
+    Sleep 40
+    return true
+}
+
 ; Input_KeyDown - 按下指定按键；参数：key=按键名称。
 Input_KeyDown(inputKeyDownKey) {
     SendEvent "{" inputKeyDownKey " down}"
