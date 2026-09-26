@@ -1,21 +1,11 @@
 #Requires AutoHotkey v2.0
 
-;================================
-; Manager_LoadScripts
-; 获取指定目录下的脚本列表
-;
-; 参数:
-; folder 脚本目录
-;
-; 返回:
-; 脚本对象数组
-;================================
-
+; Manager_LoadScripts - 获取指定目录下的AHK脚本列表；参数：folder=脚本目录。
 Manager_LoadScripts(folder)
 {
     scripts := []
 
-    Loop Files, folder "\\*.ahk"
+    Loop Files, folder "\*.ahk"
     {
         scripts.Push({
             name: A_LoopFileName,
@@ -26,18 +16,7 @@ Manager_LoadScripts(folder)
     return scripts
 }
 
-
-;================================
-; Manager_GetScriptName
-; 获取脚本显示名称
-;
-; 参数:
-; script 脚本对象
-;
-; 返回:
-; 文件名称
-;================================
-
+; Manager_GetScriptName - 获取脚本显示名称；参数：script=脚本对象。
 Manager_GetScriptName(script)
 {
     return script.name
