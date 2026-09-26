@@ -72,8 +72,11 @@ Input_CapturePhysicalKeys() {
     return inputCapturePhysicalKeysMap
 }
 
-; Input_FindNewPhysicalInput - 找出启动快照之后新增的物理输入。
+; Input_FindNewPhysicalInput - 找出启动快照之后新增的物理输入；IME开启时忽略中文输入过程。
 Input_FindNewPhysicalInput(inputFindNewPhysicalInputBaseline) {
+    if Input_IsImeOpen()
+        return false
+
     inputFindNewPhysicalInputCurrent := Input_CapturePhysicalKeys()
     inputFindNewPhysicalInputReleasedKeys := []
 
@@ -91,6 +94,21 @@ Input_FindNewPhysicalInput(inputFindNewPhysicalInputBaseline) {
     }
 
     return false
+}
+
+; Input_IsImeOpen - 判断当前前台窗口是否开启输入法。
+Input_IsImeOpen() {
+    inputIsImeOpenHwnd := WinExist("A")
+    if !inputIsImeOpenHwnd
+        return false
+
+    inputIsImeOpenContext := DllCall("imm32\ImmGetContext", "Ptr", inputIsImeOpenHwnd, "Ptr")
+    if !inputIsImeOpenContext
+        return false
+
+    inputIsImeOpenStatus := DllCall("imm32\ImmGetOpenStatus", "Ptr", inputIsImeOpenContext)
+    DllCall("imm32\ImmReleaseContext", "Ptr", inputIsImeOpenHwnd, "Ptr", inputIsImeOpenContext)
+    return inputIsImeOpenStatus != 0
 }
 
 ; Input_KeyDown - 按下指定按键；参数：key=按键名称。
