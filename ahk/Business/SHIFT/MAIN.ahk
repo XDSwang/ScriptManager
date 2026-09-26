@@ -16,7 +16,7 @@
 ; ★ → 注册 GL 的 0xB001 退出消息
 ; ★ → 注册 OnExit，保证异常结束时也释放 Shift
 ;
-; ★ F6：*F6 → Task_Process_Start → Input_InputControl_StartGuard → SHIFT_Down → 标记运行 → 更新状态。
+; ★ F6：*F6 → Task_Process_Start → Input_InputControl_StartGuard → Task_Action_Down → 标记运行 → 更新状态。
 ; ★ F7：*F7 → Task_Process_Stop → 停止输入保护 → Task_Action_ReleaseKeys → Shift 抬起 → 回到待机。
 ; ★ 用户操作：InputGuard 检测到新的物理按键 → SHIFT_PauseForInput → Shift 抬起 → 等记录的干扰键全部释放 → 自动再次 Task_Process_Start。
 ; ★ GL 切换 / F8：GL 发 0xB001 → Task_Process_Exit → Task_Process_Stop → 删除 HWND 文件 → ExitApp。
