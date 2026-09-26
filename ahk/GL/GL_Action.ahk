@@ -5,7 +5,7 @@ GL_SwitchScript(glSwitchStep, glSwitchScripts, &glSwitchCurrentIndex, glSwitchMa
         return
 
     if glSwitchCurrentIndex > 0
-        GL_StopCurrent(glSwitchScripts, glSwitchCurrentIndex)
+        GL_StopCurrent(glSwitchScripts, glSwitchCurrentIndex, GLMessage.ExitReasonSwitch)
 
     glSwitchCurrentIndex += glSwitchStep
     if glSwitchCurrentIndex < 1
@@ -28,19 +28,22 @@ GL_StartFirst(glStartScripts, &glStartCurrentIndex, glStartManagerGuiState) {
     GL_Refresh(glStartManagerGuiState, glStartScripts, glStartCurrentIndex)
 }
 
-GL_StopCurrent(glStopScripts, glStopCurrentIndex) {
+GL_StopCurrent(glStopScripts, glStopCurrentIndex, glStopCurrentReason) {
+    if glStopCurrentIndex < 1 || glStopCurrentIndex > glStopScripts.Length
+        return false
+
     SplitPath glStopScripts[glStopCurrentIndex].path, &glStopCurrentFileName, &glStopCurrentDir
-    glStopCurrentHwndFile := glStopCurrentDir "" glStopCurrentFileName ".txt"
+    glStopCurrentHwndFile := glStopCurrentDir "\" glStopCurrentFileName ".txt"
 
     if !FileExist(glStopCurrentHwndFile)
-        return
+        return false
 
-    GL_RequestExitCurrent(glStopScripts, glStopCurrentIndex, GLMessage.ExitReasonSwitch)
+    GL_RequestExitCurrent(glStopScripts, glStopCurrentIndex, glStopCurrentReason)
 
     Loop {
         Sleep 50
         if !FileExist(glStopCurrentHwndFile)
-            break
+            return true
     }
 }
 
@@ -49,7 +52,7 @@ GL_RequestExitCurrent(glRequestExitScripts, glRequestExitCurrentIndex, glRequest
         return
 
     SplitPath glRequestExitScripts[glRequestExitCurrentIndex].path, &glRequestExitFileName, &glRequestExitDir
-    glRequestExitHwndFile := glRequestExitDir "" glRequestExitFileName ".txt"
+    glRequestExitHwndFile := glRequestExitDir "\" glRequestExitFileName ".txt"
 
     if !FileExist(glRequestExitHwndFile)
         return
@@ -79,8 +82,8 @@ GL_ReadHwndFile(glReadHwndFile) {
 }
 
 GL_ExitManager(glExitManagerScripts, glExitManagerCurrentIndex) {
-    GL_RequestExitCurrent(glExitManagerScripts, glExitManagerCurrentIndex, GLMessage.ExitReasonManager)
-    GL_LogError("GL F8 退出", "管理器主动结束；已通知当前子脚本退出")
+    GL_StopCurrent(glExitManagerScripts, glExitManagerCurrentIndex, GLMessage.ExitReasonManager)
+    GL_LogError("GL F8 退出", "管理器主动结束；已等待当前子脚本退出")
     ExitApp
 }
 
