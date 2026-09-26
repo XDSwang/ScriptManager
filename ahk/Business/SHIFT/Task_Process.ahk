@@ -10,7 +10,7 @@ SHIFT_Start(&shiftStartHeld, shiftStartStatusText, shiftStartInputGuard) {
     if shiftStartHeld
         return
 
-    Input_StartGuard(
+    Common_InputControl_StartGuard(
         shiftStartInputGuard,
         (*) => SHIFT_PauseForInput(&shiftStartHeld, shiftStartStatusText),
         (*) => SHIFT_Start(&shiftStartHeld, shiftStartStatusText, shiftStartInputGuard)
@@ -23,7 +23,7 @@ SHIFT_Start(&shiftStartHeld, shiftStartStatusText, shiftStartInputGuard) {
 
 ; ★ SHIFT_Stop：F7、GL 切换、GL F8 都使用同一套停止流程。
 SHIFT_Stop(&shiftStopHeld, shiftStopStatusText, shiftStopInputGuard) {
-    Input_StopGuard(shiftStopInputGuard)
+    Common_InputControl_StopGuard(shiftStopInputGuard)
     SHIFT_ReleaseKeys(&shiftStopHeld, shiftStopInputGuard)
     SHIFT_UpdateStatus(shiftStopStatusText, "● 待机 | F6 开启")
 }
@@ -51,8 +51,8 @@ SHIFT_WriteHwnd(shiftWriteHwndFile, shiftWriteHwndGui) {
 SHIFT_Exit(shiftExitReason, shiftExitHwndFile, &shiftExitHeld, shiftExitInputGuard, shiftExitStatusText) {
     SHIFT_Stop(&shiftExitHeld, shiftExitStatusText, shiftExitInputGuard)
 
-    if shiftExitReason = GLMessage.ExitReasonManager
-        GL_LogError("GL F8 子脚本退出", "SHIFT 收到管理器退出通知")
+    if shiftExitReason = Common_Message_Exit.ExitReasonManager
+        Common_Log_Error("GL F8 子脚本退出", "SHIFT 收到管理器退出通知")
 
     if FileExist(shiftExitHwndFile)
         FileDelete shiftExitHwndFile
