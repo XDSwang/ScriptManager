@@ -4,6 +4,8 @@
 GL_WindowActivate(glWindowActivateHwnd) {
     if glWindowActivateHwnd
         WinActivate("ahk_id " glWindowActivateHwnd)
+
+    return true
 }
 
 ; GL_WindowExists - 检查指定窗口是否存在；参数：hwnd=目标窗口句柄。
