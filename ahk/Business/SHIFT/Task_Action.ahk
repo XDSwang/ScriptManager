@@ -19,7 +19,7 @@ SHIFT_UpdateStatus(shiftUpdateStatusText, shiftUpdateStatusValue) {
 ; ★ 统一释放出口。
 ; ★ F7、GL 切换、GL F8、OnExit 最终都必须保证 Shift 被释放。
 SHIFT_ReleaseKeys(&shiftReleaseHeld, shiftReleaseInputGuard) {
-    Common_InputControl_StopGuard(shiftReleaseInputGuard)
+    Input_InputControl_StopGuard(shiftReleaseInputGuard)
     SendEvent "{LShift up}"
     shiftReleaseHeld := false
 }
