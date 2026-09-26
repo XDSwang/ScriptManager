@@ -16,8 +16,9 @@ GL_Main(glMainScriptFolder) {
 
     GL_StartFirst(glMainScripts, &glMainCurrentIndex, glMainManagerGuiState)
 
-    Hotkey("^Up", (*) => GL_SwitchScript(1, glMainScripts, &glMainCurrentIndex, glMainManagerGuiState))
-    Hotkey("^Down", (*) => GL_SwitchScript(-1, glMainScripts, &glMainCurrentIndex, glMainManagerGuiState))
+    ; GL 切换热键必须使用 *^：子脚本可能持续物理/模拟按住 Shift、Ctrl、Alt 或 Win，* 可确保 Ctrl+方向键不因额外修饰键而失效。
+    Hotkey("*^Up", (*) => GL_SwitchScript(1, glMainScripts, &glMainCurrentIndex, glMainManagerGuiState))
+    Hotkey("*^Down", (*) => GL_SwitchScript(-1, glMainScripts, &glMainCurrentIndex, glMainManagerGuiState))
     Hotkey("F8", (*) => GL_ExitManager(glMainScripts, glMainCurrentIndex))
 }
 
