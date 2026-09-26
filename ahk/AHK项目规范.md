@@ -211,7 +211,7 @@ Lib/Input/InputControl.ahk
 - Input_InputControl_StartGuard() = 完整公共函数名称。
 
 因此禁止：
-- Common_InputControl_StartGuard()
+- Input_InputControl_StartGuard()
 - Input_StartGuard()
 - StartGuard()
 
@@ -330,7 +330,7 @@ Lib/File/FileControl.ahk
 WQFFF_Start()
 
 公共库函数：
-Common_InputControl_StartGuard()
+Input_InputControl_StartGuard()
 
 函数参数：
 wqfffStartRunning
@@ -609,7 +609,7 @@ ahk/Lib/Input/InputControl.ahk
 
 ```ahk
 shiftMainControlKeys := ["F6", "F7"]
-shiftMainInputGuard := Common_InputControl_CreateGuard(shiftMainControlKeys)
+shiftMainInputGuard := Input_InputControl_CreateGuard(shiftMainControlKeys)
 ```
 
 这里的控制键是本脚本用于启动、暂停、退出等控制功能的按键。控制键会被输入保护忽略，因此：
