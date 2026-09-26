@@ -12,15 +12,20 @@ class GLGui {
     }
 
     static UpdateList(gui, scripts, currentIndex) {
-        gui.Destroy()
+        if gui
+            gui.Destroy()
+
         gui := Gui("+AlwaysOnTop", "GL管理器")
         gui.BackColor := "000000"
-        gui.SetFont("s9 cFFFFFF", "Microsoft YaHei")
+
+        x := 8
+        y := 9
 
         for index, item in scripts {
             color := index = currentIndex ? "FF0000" : "FFFFFF"
             gui.SetFont("s9 c" color, "Microsoft YaHei")
-            gui.AddText("x10 w280", item.name)
+            control := gui.AddText("x" x " y" y, item.name)
+            x += control.GetPos(&cx, &cy, &cw, &ch), cw + 8
         }
 
         gui.Show("w300 h35")
