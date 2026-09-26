@@ -11,7 +11,7 @@ WQFFF_Start(&wqfffStartRunning, &wqfffStartFInterval, &wqfffStartPressTimer, wqf
     if wqfffStartRunning
         return
 
-    Input_StartGuard(
+    Common_InputControl_StartGuard(
         wqfffStartInputGuard,
         (*) => WQFFF_PauseForInput(&wqfffStartRunning, wqfffStartPressTimer, wqfffStartStatusText),
         (*) => WQFFF_Start(&wqfffStartRunning, wqfffStartFInterval, wqfffStartPressTimer, wqfffStartStatusText, wqfffStartInputGuard)
@@ -25,7 +25,7 @@ WQFFF_Start(&wqfffStartRunning, &wqfffStartFInterval, &wqfffStartPressTimer, wqf
 
 ; ★ WQFFF_Stop：F7、GL 切换、GL F8 共用的停止流程。
 WQFFF_Stop(&wqfffStopRunning, wqfffStopPressTimer, wqfffStopStatusText, wqfffStopInputGuard) {
-    Input_StopGuard(wqfffStopInputGuard)
+    Common_InputControl_StopGuard(wqfffStopInputGuard)
     WQFFF_ReleaseKeys(&wqfffStopRunning, wqfffStopPressTimer, wqfffStopInputGuard)
     WQFFF_UpdateStatus(wqfffStopStatusText, "● 待机 | F6 开启")
 }
@@ -60,8 +60,8 @@ WQFFF_WriteHwnd(wqfffWriteHwndFile, wqfffWriteHwndGui) {
 WQFFF_Exit(wqfffExitReason, wqfffExitHwndFile, &wqfffExitRunning, wqfffExitPressTimer, wqfffExitInputGuard, wqfffExitStatusText) {
     WQFFF_Stop(&wqfffExitRunning, wqfffExitPressTimer, wqfffExitStatusText, wqfffExitInputGuard)
 
-    if wqfffExitReason = GLMessage.ExitReasonManager
-        GL_LogError("GL F8 子脚本退出", "WQFFF 收到管理器退出通知")
+    if wqfffExitReason = Common_Message_Exit.ExitReasonManager
+        Common_Log_Error("GL F8 子脚本退出", "WQFFF 收到管理器退出通知")
 
     if FileExist(wqfffExitHwndFile)
         FileDelete wqfffExitHwndFile
