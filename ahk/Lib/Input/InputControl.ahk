@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 
-; Input_CreateGuard - 创建输入干扰检测状态。
+; Input_CreateGuard - 创建输入干扰检测状态对象；参数：无。
 Input_CreateGuard() {
     inputCreateGuardState := {
         monitoring: false,
@@ -11,7 +11,7 @@ Input_CreateGuard() {
     return inputCreateGuardState
 }
 
-; Input_StartGuard - 记录启动时已按下的物理按键，并开始检测新的用户输入。
+; Input_StartGuard - 记录启动瞬间的物理按键并开始检测新增用户输入；参数：state=输入检测状态对象，interferenceCallback=检测到新增物理输入时调用的回调，resumeCallback=新增输入消失后调用的恢复回调。
 Input_StartGuard(inputStartGuardState, inputStartGuardInterferenceCallback, inputStartGuardResumeCallback) {
     Input_StopGuard(inputStartGuardState)
 
@@ -23,7 +23,7 @@ Input_StartGuard(inputStartGuardState, inputStartGuardInterferenceCallback, inpu
     return true
 }
 
-; Input_StopGuard - 停止输入干扰检测。
+; Input_StopGuard - 停止输入干扰检测并清空检测状态；参数：state=输入检测状态对象。
 Input_StopGuard(inputStopGuardState) {
     inputStopGuardState.monitoring := false
     inputStopGuardState.paused := false
@@ -36,10 +36,10 @@ Input_StopGuard(inputStopGuardState) {
     return true
 }
 
-; Input_CheckGuard - 检测启动快照之外的新物理输入；脚本 SendEvent 不会被物理状态检测误判。
+; Input_CheckGuard - 按当前状态检查是否出现新的物理输入，并触发暂停或恢复回调；参数：state=输入检测状态对象，interferenceCallback=检测到新增输入时的回调，resumeCallback=干扰解除后的恢复回调。
 Input_CheckGuard(inputCheckGuardState, inputCheckGuardInterferenceCallback, inputCheckGuardResumeCallback) {
     if !inputCheckGuardState.monitoring
-        return
+        return false
 
     inputCheckGuardNewInput := Input_FindNewPhysicalInput(inputCheckGuardState.baseline)
 
@@ -48,16 +48,19 @@ Input_CheckGuard(inputCheckGuardState, inputCheckGuardInterferenceCallback, inpu
             inputCheckGuardState.paused := true
             inputCheckGuardInterferenceCallback.Call()
         }
-        return
+        return inputCheckGuardNewInput
     }
 
     if !inputCheckGuardNewInput {
         inputCheckGuardState.paused := false
         inputCheckGuardResumeCallback.Call()
+        return true
     }
+
+    return false
 }
 
-; Input_CapturePhysicalKeys - 获取当前所有处于物理按下状态的虚拟键。
+; Input_CapturePhysicalKeys - 获取当前所有处于物理按下状态的虚拟键；参数：无。
 Input_CapturePhysicalKeys() {
     inputCapturePhysicalKeysMap := Map()
 
@@ -72,7 +75,7 @@ Input_CapturePhysicalKeys() {
     return inputCapturePhysicalKeysMap
 }
 
-; Input_FindNewPhysicalInput - 找出启动快照之后新增的物理输入；IME开启时忽略中文输入过程。
+; Input_FindNewPhysicalInput - 根据启动基线查找新增物理输入，并同步移除已经释放的基线按键；参数：baseline=启动时的物理按键基线。
 Input_FindNewPhysicalInput(inputFindNewPhysicalInputBaseline) {
     if Input_IsImeOpen()
         return false
@@ -96,7 +99,7 @@ Input_FindNewPhysicalInput(inputFindNewPhysicalInputBaseline) {
     return false
 }
 
-; Input_IsImeOpen - 判断当前前台窗口是否开启输入法。
+; Input_IsImeOpen - 判断当前活动窗口是否处于开启输入法状态；参数：无。
 Input_IsImeOpen() {
     inputIsImeOpenHwnd := WinExist("A")
     if !inputIsImeOpenHwnd
@@ -111,19 +114,19 @@ Input_IsImeOpen() {
     return inputIsImeOpenStatus != 0
 }
 
-; Input_KeyDown - 按下指定按键；参数：key=按键名称。
+; Input_KeyDown - 通过 SendEvent 按下指定按键；参数：key=AHK 按键名称。
 Input_KeyDown(inputKeyDownKey) {
     SendEvent "{" inputKeyDownKey " down}"
     return true
 }
 
-; Input_KeyUp - 释放指定按键；参数：key=按键名称。
+; Input_KeyUp - 通过 SendEvent 释放指定按键；参数：key=AHK 按键名称。
 Input_KeyUp(inputKeyUpKey) {
     SendEvent "{" inputKeyUpKey " up}"
     return true
 }
 
-; Input_ReleaseKeys - 释放按键数组中的所有按键；参数：keys=按键数组。
+; Input_ReleaseKeys - 按顺序释放传入按键数组中的所有按键；参数：keys=需要释放的 AHK 按键名称数组。
 Input_ReleaseKeys(inputReleaseKeysList) {
     for inputReleaseKeysKey in inputReleaseKeysList
         Input_KeyUp(inputReleaseKeysKey)
