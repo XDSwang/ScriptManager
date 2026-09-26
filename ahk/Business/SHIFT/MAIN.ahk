@@ -25,23 +25,18 @@ FileAppend(myGui.Hwnd, glFile)
 
 *F7::
 {
-    ReleaseKeys()
+    global running
+    ReleaseShift()
+    running := false
     text.Text := "● 待机 | F6 开启"
 }
 
 OnMessage(0xB001, GL_Exit)
-OnExit(ReleaseKeys)
+OnExit(ReleaseShift)
 
 GL_Exit(*)
 {
-    ReleaseKeys()
+    ReleaseShift()
     Sleep(100)
     ExitApp
-}
-
-ReleaseKeys(*)
-{
-    global running
-    Send("{Shift up}")
-    running := false
 }
