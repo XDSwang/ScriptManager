@@ -4,6 +4,7 @@
 
 #Include ../../Lib/Common/GUI.ahk
 #Include ../../Lib/Common/Message.ahk
+#Include ../../Lib/Common/Log.ahk
 #Include ../../Lib/Input/InputControl.ahk
 #Include Task_Action.ahk
 #Include Task_Process.ahk
@@ -20,7 +21,7 @@ SHIFT_Main() {
 
     Hotkey("*F6", (*) => SHIFT_Start(&shiftMainHeld, shiftMainStatusText, shiftMainInputGuard))
     Hotkey("*F7", (*) => SHIFT_Stop(&shiftMainHeld, shiftMainStatusText, shiftMainInputGuard))
-    OnMessage(0xB001, (*) => SHIFT_Exit(shiftMainHwndFile, &shiftMainHeld, shiftMainInputGuard, shiftMainStatusText))
+    OnMessage(0xB001, (wParam, lParam, msg, hwnd) => SHIFT_Exit(wParam, shiftMainHwndFile, &shiftMainHeld, shiftMainInputGuard, shiftMainStatusText))
     OnExit((*) => SHIFT_ReleaseKeys(&shiftMainHeld, shiftMainInputGuard))
 }
 
