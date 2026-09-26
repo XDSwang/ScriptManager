@@ -22,7 +22,7 @@ WQFFF_Stop(&wqfffStopRunning, wqfffStopPressTimer, wqfffStopStatusText, wqfffSto
     WQFFF_UpdateStatus(wqfffStopStatusText, "● 待机 | F6 开启")
 }
 
-WQFFF_PauseForInput(&wqfffPauseRunning, wqfffPausePressTimer, wqfffPauseStatusText) {
+WQFFF_PauseForInput(&wqfffPauseRunning, &wqfffPausePressTimer, wqfffPauseStatusText) {
     wqfffPauseRunning := false
     SetTimer(wqfffPausePressTimer, 0)
     WQFFF_Up()
@@ -43,8 +43,11 @@ WQFFF_WriteHwnd(wqfffWriteHwndFile, wqfffWriteHwndGui) {
     FileAppend(wqfffWriteHwndGui.Hwnd, wqfffWriteHwndFile)
 }
 
-WQFFF_Exit(wqfffExitHwndFile, &wqfffExitRunning, wqfffExitPressTimer, wqfffExitInputGuard, wqfffExitStatusText) {
+WQFFF_Exit(wqfffExitReason, wqfffExitHwndFile, &wqfffExitRunning, wqfffExitPressTimer, wqfffExitInputGuard, wqfffExitStatusText) {
     WQFFF_Stop(&wqfffExitRunning, wqfffExitPressTimer, wqfffExitStatusText, wqfffExitInputGuard)
+
+    if wqfffExitReason = GLMessage.ExitReasonManager
+        GL_LogError("GL F8 子脚本退出", "WQFFF 收到管理器退出通知")
 
     if FileExist(wqfffExitHwndFile)
         FileDelete wqfffExitHwndFile
