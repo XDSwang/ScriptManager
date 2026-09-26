@@ -20,7 +20,7 @@ SHIFT_Main() {
 
     Hotkey("*F6", (*) => SHIFT_Start(&shiftMainHeld, shiftMainStatusText, shiftMainInputGuard))
     Hotkey("*F7", (*) => SHIFT_Stop(&shiftMainHeld, shiftMainStatusText, shiftMainInputGuard))
-    OnMessage(0xB001, (*) => SHIFT_Exit(shiftMainHwndFile, &shiftMainHeld, shiftMainInputGuard))
+    OnMessage(0xB001, (*) => SHIFT_Exit(shiftMainHwndFile, &shiftMainHeld, shiftMainInputGuard, shiftMainStatusText))
     OnExit((*) => SHIFT_ReleaseKeys(&shiftMainHeld, shiftMainInputGuard))
 }
 
