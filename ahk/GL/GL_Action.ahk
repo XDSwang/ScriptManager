@@ -32,22 +32,17 @@ GL_StopCurrent(glStopScripts, glStopCurrentIndex) {
     SplitPath glStopScripts[glStopCurrentIndex].path, &glStopFileName, &glStopDir
     glStopHwndFile := glStopDir "\" glStopFileName ".txt"
 
-    SendEvent "{F7}"
-    Sleep 100
+    if !FileExist(glStopHwndFile)
+        return
 
-    if FileExist(glStopHwndFile) {
-        glStopHwnd := Trim(FileRead(glStopHwndFile))
-        if glStopHwnd
-            SendExitMessage(glStopHwnd)
+    glStopHwnd := Trim(FileRead(glStopHwndFile))
+    if glStopHwnd
+        SendExitMessage(glStopHwnd)
 
-        Loop 20 {
-            Sleep 100
-            if !FileExist(glStopHwndFile)
-                break
-        }
-
-        if FileExist(glStopHwndFile)
-            FileDelete glStopHwndFile
+    Loop {
+        Sleep 50
+        if !FileExist(glStopHwndFile)
+            break
     }
 }
 
