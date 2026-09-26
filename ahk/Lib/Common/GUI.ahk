@@ -19,15 +19,15 @@ class GLGui {
         return guiObj
     }
 
-    ; UpdateList - 更新脚本名称列表和当前项颜色；参数：gui=GUI对象，scripts=脚本路径数组，currentIndex=当前索引。
-    static UpdateList(gui, scripts, currentIndex) {
-        if !gui
+    ; UpdateList - 更新脚本名称列表和当前项颜色；参数：guiObj=GUI对象，scripts=脚本路径数组，currentIndex=当前索引。
+    static UpdateList(guiObj, scripts, currentIndex) {
+        if !guiObj
             return 0
 
-        if !GLGui._controls.Has(gui.Hwnd)
-            GLGui._controls[gui.Hwnd] := []
+        if !GLGui._controls.Has(guiObj.Hwnd)
+            GLGui._controls[guiObj.Hwnd] := []
 
-        controls := GLGui._controls[gui.Hwnd]
+        controls := GLGui._controls[guiObj.Hwnd]
         x := 8
         y := 9
 
@@ -35,8 +35,8 @@ class GLGui {
             SplitPath item, &name
 
             if index > controls.Length {
-                gui.SetFont("s9 cFFFFFF", "Microsoft YaHei")
-                controls.Push(gui.AddText("x" x " y" y, name))
+                guiObj.SetFont("s9 cFFFFFF", "Microsoft YaHei")
+                controls.Push(guiObj.AddText("x" x " y" y, name))
             }
 
             control := controls[index]
@@ -56,6 +56,6 @@ class GLGui {
             controls[index].Visible := false
         }
 
-        return gui
+        return guiObj
     }
 }
