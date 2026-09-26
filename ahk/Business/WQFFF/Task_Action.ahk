@@ -26,7 +26,7 @@ WQFFF_UpdateStatus(wqfffUpdateStatusText, wqfffUpdateStatusValue) {
 ; ★ 统一释放出口。
 ; ★ F7、输入保护暂停、GL 切换、GL F8、OnExit 都最终要保证 W/Q/F 和 Timer 被清理。
 WQFFF_ReleaseKeys(&wqfffReleaseRunning, wqfffReleasePressTimer, wqfffReleaseInputGuard) {
-    Input_StopGuard(wqfffReleaseInputGuard)
+    Common_InputControl_StopGuard(wqfffReleaseInputGuard)
     SetTimer(wqfffReleasePressTimer, 0)
     SendEvent "{w up}"
     SendEvent "{q up}"
