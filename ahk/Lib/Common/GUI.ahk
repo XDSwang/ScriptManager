@@ -1,8 +1,7 @@
-; ScriptManager AHK Common GUI Library
-; AutoHotkey v2
+#Requires AutoHotkey v2.0
 
 class GLGui {
-    ; Create - 创建统一的置顶、黑底、透明GUI；参数：title=标题，width=宽度，height=高度，x/y=可选位置。
+    ; GLGui.Create - 创建统一的置顶、黑底、透明 GUI；参数：title=窗口标题，width=窗口宽度，height=窗口高度，x=可选横坐标，y=可选纵坐标。
     static Create(glGuiCreateTitle := "", glGuiCreateWidth := 300, glGuiCreateHeight := 35, glGuiCreateX := unset, glGuiCreateY := unset) {
         glGuiCreateGuiObj := Gui("+AlwaysOnTop", glGuiCreateTitle)
         glGuiCreateGuiObj.BackColor := "000000"
@@ -17,7 +16,7 @@ class GLGui {
         return {gui: glGuiCreateGuiObj, controls: []}
     }
 
-    ; UpdateList - 更新脚本显示名称和当前项颜色；scripts中的name用于显示，path仅用于内部启动。
+    ; GLGui.UpdateList - 更新 GUI 中的脚本名称列表并设置当前项颜色；参数：state=GLGui.Create() 返回状态对象，scripts=脚本对象数组，currentIndex=当前脚本索引。
     static UpdateList(glGuiUpdateListState, glGuiUpdateListScripts, glGuiUpdateListCurrentIndex) {
         if !glGuiUpdateListState
             return 0
