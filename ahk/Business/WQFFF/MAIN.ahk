@@ -7,48 +7,20 @@
 #Include Task_Action.ahk
 #Include Task_Process.ahk
 
-myGui := GLGui.Create("W Q F 控制", 300, 35, 0, 0)
-statusText := myGui.AddText("x10 y7 w280 h20 Center", "● 待机 | F6 开启")
+WQFFF_Main() {
+    wqfffMainGui := GLGui.Create("W Q F 控制", 300, 35, 0, 0)
+    wqfffMainStatusText := wqfffMainGui.AddText("x10 y7 w280 h20 Center", "● 待机 | F6 开启")
+    wqfffMainRunning := false
+    wqfffMainFInterval := 100
+    wqfffMainHwndFile := A_ScriptDir "\" A_ScriptName ".txt"
+    wqfffMainPressTimer := (*) => WQFFF_PressFTimer(&wqfffMainRunning)
 
-running := false
-fInterval := 100
+    WQFFF_WriteHwnd(wqfffMainHwndFile, wqfffMainGui)
 
-glFile := A_ScriptDir "\" A_ScriptName ".txt"
-WQFFF_WriteHwnd()
-
-OnMessage(0xB001, GL_Exit)
-OnExit(WQFFF_ReleaseKeys)
-
-*F6::
-{
-    WQFFF_Start()
+    Hotkey("*F6", (*) => WQFFF_Start(&wqfffMainRunning, wqfffMainFInterval, wqfffMainPressTimer, wqfffMainStatusText))
+    Hotkey("*F7", (*) => WQFFF_Stop(&wqfffMainRunning, wqfffMainPressTimer, wqfffMainStatusText))
+    OnMessage(0xB001, (*) => WQFFF_Exit(wqfffMainHwndFile, &wqfffMainRunning, wqfffMainPressTimer))
+    OnExit((*) => WQFFF_ReleaseKeys(&wqfffMainRunning, wqfffMainPressTimer))
 }
 
-*F7::
-{
-    WQFFF_Stop()
-}
-
-WQFFF_ReleaseKeys(*)
-{
-    global running
-
-    SetTimer(WQFFF_PressFTimer, 0)
-    SendEvent "{w up}"
-    SendEvent "{q up}"
-    SendEvent "{f up}"
-    running := false
-}
-
-GL_Exit(*)
-{
-    global glFile
-
-    WQFFF_ReleaseKeys()
-
-    if FileExist(glFile)
-        FileDelete(glFile)
-
-    Sleep 100
-    ExitApp
-}
+WQFFF_Main()
