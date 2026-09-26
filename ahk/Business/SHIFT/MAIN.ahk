@@ -16,7 +16,7 @@
 ; ★ → 注册 GL 的 0xB001 退出消息
 ; ★ → 注册 OnExit，保证异常结束时也释放 Shift
 ;
-; ★ F6：*F6 → SHIFT_Start → Common_InputControl_StartGuard → SHIFT_Down → 标记运行 → 更新状态。
+; ★ F6：*F6 → SHIFT_Start → Input_InputControl_StartGuard → SHIFT_Down → 标记运行 → 更新状态。
 ; ★ F7：*F7 → SHIFT_Stop → 停止输入保护 → SHIFT_ReleaseKeys → Shift 抬起 → 回到待机。
 ; ★ 用户操作：InputGuard 检测到新的物理按键 → SHIFT_PauseForInput → Shift 抬起 → 等记录的干扰键全部释放 → 自动再次 SHIFT_Start。
 ; ★ GL 切换 / F8：GL 发 0xB001 → SHIFT_Exit → SHIFT_Stop → 删除 HWND 文件 → ExitApp。
@@ -33,7 +33,7 @@ SHIFT_Main() {
 
     ; ★ 控制键必须加入忽略列表，否则输入保护可能把 F6/F7 自己当成用户干扰。
     shiftMainControlKeys := ["F6", "F7"]
-    shiftMainInputGuard := Common_InputControl_CreateGuard(shiftMainControlKeys)
+    shiftMainInputGuard := Input_InputControl_CreateGuard(shiftMainControlKeys)
 
     ; ★ 写入本脚本 GUI 的 HWND，供 GL 管理器通过 .txt 找到本脚本并发送退出消息。
     SHIFT_WriteHwnd(shiftMainHwndFile, shiftMainGui)
