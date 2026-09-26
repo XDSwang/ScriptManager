@@ -28,23 +28,23 @@
 ; ★ 热键中的 * 表示“允许额外修饰键存在时仍触发”。
 ; ★ 例如子脚本正在模拟按住 Shift/Ctrl/Alt/Win 时，*^Up / *^Down 仍应能执行切换，*F8 仍应能执行退出。
 
-GL_Main(glMainScriptFolder) {
+MAIN(glMainScriptFolder) {
     ; 入口只负责“接线”：加载脚本、初始化状态、创建 GUI、启动第一个脚本、注册管理器热键。
-    glMainScripts := GL_LoadScripts(glMainScriptFolder)
+    glMainScripts := GL_Process_LoadScripts(glMainScriptFolder)
     glMainCurrentIndex := 0
-    glMainManagerGuiState := GL_Show()
+    glMainManagerGuiState := GL_Action_Show()
 
-    ; ★ 管理器启动后的第一条实际运行链：GL_StartFirst → Run(第一个子脚本 MAIN.ahk)。
-    GL_StartFirst(glMainScripts, &glMainCurrentIndex, glMainManagerGuiState)
+    ; ★ 管理器启动后的第一条实际运行链：GL_Action_StartFirst → Run(第一个子脚本 MAIN.ahk)。
+    GL_Action_StartFirst(glMainScripts, &glMainCurrentIndex, glMainManagerGuiState)
 
     ; ★ Ctrl+Up：切换到下一个子脚本。
-    Hotkey("*^Up", (*) => GL_SwitchScript(1, glMainScripts, &glMainCurrentIndex, glMainManagerGuiState))
+    Hotkey("*^Up", (*) => GL_Action_SwitchScript(1, glMainScripts, &glMainCurrentIndex, glMainManagerGuiState))
 
     ; ★ Ctrl+Down：切换到上一个子脚本。
-    Hotkey("*^Down", (*) => GL_SwitchScript(-1, glMainScripts, &glMainCurrentIndex, glMainManagerGuiState))
+    Hotkey("*^Down", (*) => GL_Action_SwitchScript(-1, glMainScripts, &glMainCurrentIndex, glMainManagerGuiState))
 
     ; ★ F8：退出管理器。先让当前子脚本完整退出，再退出 GL。
-    Hotkey("*F8", (*) => GL_ExitManager(glMainScripts, glMainCurrentIndex))
+    Hotkey("*F8", (*) => GL_Action_ExitManager(glMainScripts, glMainCurrentIndex))
 }
 
-GL_Main(GL_GetManagedFolder())
+MAIN(GL_Config_GetManagedFolder())
