@@ -17,7 +17,7 @@ class GLGui {
         return {gui: glGuiCreateGuiObj, controls: []}
     }
 
-    ; UpdateList - 更新脚本名称列表和当前项颜色；参数：guiState=GLGui.Create返回对象，scripts=脚本路径数组，currentIndex=当前索引。
+    ; UpdateList - 更新脚本显示名称和当前项颜色；scripts中的name用于显示，path仅用于内部启动。
     static UpdateList(glGuiUpdateListState, glGuiUpdateListScripts, glGuiUpdateListCurrentIndex) {
         if !glGuiUpdateListState
             return 0
@@ -28,7 +28,7 @@ class GLGui {
         glGuiUpdateListY := 9
 
         for glGuiUpdateListIndex, glGuiUpdateListItem in glGuiUpdateListScripts {
-            SplitPath glGuiUpdateListItem, &glGuiUpdateListName
+            glGuiUpdateListName := glGuiUpdateListItem.name
 
             if glGuiUpdateListIndex > glGuiUpdateListControls.Length {
                 glGuiUpdateListGuiObj.SetFont("s9 cFFFFFF", "Microsoft YaHei")
