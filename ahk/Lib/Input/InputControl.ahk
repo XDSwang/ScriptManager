@@ -1,13 +1,21 @@
 #Requires AutoHotkey v2.0
 
-; Input_CreateGuard - 创建输入干扰检测状态对象；参数：无。
-Input_CreateGuard() {
+; Input_CreateGuard - 创建输入干扰检测状态对象；参数：controlKeys=本脚本用于启动、暂停、退出等控制功能的按键名称数组，可省略。
+Input_CreateGuard(inputCreateGuardControlKeys := []) {
     inputCreateGuardState := {
         monitoring: false,
         paused: false,
         baseline: Map(),
+        ignoredKeys: Map(),
         timer: 0
     }
+
+    for inputCreateGuardControlKey in inputCreateGuardControlKeys {
+        inputCreateGuardControlKeyVk := GetKeyVK(inputCreateGuardControlKey)
+        if inputCreateGuardControlKeyVk
+            inputCreateGuardState.ignoredKeys["vk" Format("{:02X}", inputCreateGuardControlKeyVk)] := true
+    }
+
     return inputCreateGuardState
 }
 
@@ -41,7 +49,7 @@ Input_CheckGuard(inputCheckGuardState, inputCheckGuardInterferenceCallback, inpu
     if !inputCheckGuardState.monitoring
         return false
 
-    inputCheckGuardNewInput := Input_FindNewPhysicalInput(inputCheckGuardState.baseline)
+    inputCheckGuardNewInput := Input_FindNewPhysicalInput(inputCheckGuardState.baseline, inputCheckGuardState.ignoredKeys)
 
     if !inputCheckGuardState.paused {
         if inputCheckGuardNewInput {
@@ -75,8 +83,8 @@ Input_CapturePhysicalKeys() {
     return inputCapturePhysicalKeysMap
 }
 
-; Input_FindNewPhysicalInput - 根据启动基线查找新增物理输入，并忽略 F6/F7 控制键；参数：baseline=启动时的物理按键基线。
-Input_FindNewPhysicalInput(inputFindNewPhysicalInputBaseline) {
+; Input_FindNewPhysicalInput - 根据启动基线查找新增物理输入，并忽略调用方声明的控制键；参数：baseline=启动时的物理按键基线，ignoredKeys=需要忽略的虚拟键名称 Map，可省略。
+Input_FindNewPhysicalInput(inputFindNewPhysicalInputBaseline, inputFindNewPhysicalInputIgnoredKeys := unset) {
     if Input_IsImeOpen()
         return false
 
@@ -91,10 +99,8 @@ Input_FindNewPhysicalInput(inputFindNewPhysicalInputBaseline) {
     for inputFindNewPhysicalInputKey in inputFindNewPhysicalInputReleasedKeys
         inputFindNewPhysicalInputBaseline.Delete(inputFindNewPhysicalInputKey)
 
-    inputFindNewPhysicalInputIgnoredKeys := Map(
-        "vk75", true,
-        "vk76", true
-    )
+    if !IsSet(inputFindNewPhysicalInputIgnoredKeys)
+        inputFindNewPhysicalInputIgnoredKeys := Map()
 
     for inputFindNewPhysicalInputKey in inputFindNewPhysicalInputCurrent {
         if inputFindNewPhysicalInputIgnoredKeys.Has(inputFindNewPhysicalInputKey)
