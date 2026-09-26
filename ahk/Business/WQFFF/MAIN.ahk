@@ -11,7 +11,7 @@ status := myGui.AddText("w280 h25", "● 待机 | F6 开启")
 running := false
 fInterval := 100
 
-glFile := A_ScriptDir "\\" A_ScriptName ".txt"
+glFile := A_ScriptDir "\" A_ScriptName ".txt"
 if FileExist(glFile)
     FileDelete(glFile)
 FileAppend(myGui.Hwnd, glFile)
@@ -32,10 +32,7 @@ OnExit(ReleaseKeys)
 
 *F7::
 {
-    global running
-    running := false
-    SetTimer(PressF, 0)
-    Send "{w up}{q up}"
+    ReleaseKeys()
     status.Text := "● 待机 | F6 开启"
 }
 
@@ -45,6 +42,14 @@ PressF()
     if !running
         return
     Send "f"
+}
+
+ReleaseKeys(*)
+{
+    global running
+    running := false
+    SetTimer(PressF, 0)
+    Send "{w up}{q up}"
 }
 
 GL_Exit(*)
