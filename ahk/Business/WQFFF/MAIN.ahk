@@ -7,7 +7,7 @@
 #Include Task_Action.ahk
 #Include Task_Process.ahk
 
-myGui := GLGui.Create("W Q F 控制")
+myGui := GLGui.Create("W Q F 控制", 300, 35, 0, 0)
 statusText := myGui.AddText("x10 y7 w280 h20 Center", "● 待机 | F6 开启")
 
 running := false
