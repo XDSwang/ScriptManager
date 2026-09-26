@@ -1,62 +1,54 @@
 #Requires AutoHotkey v2.0
 
-class GLGui {
-    ; ★ GLGui.Create：所有管理器/子脚本 GUI 的统一模板。
-    ; ★ AlwaysOnTop = 始终置顶。
-    ; ★ 黑底 + 透明 = 统一外观。
-    ; ★ NA = ★显示窗口但不激活它，避免切换子脚本后键盘焦点跑到 AHK GUI。
-    ; ★ 以后新增子脚本时，通常只改标题和业务状态文字，不要重复实现 GUI 样式。
-    static Create(glGuiCreateTitle := "", glGuiCreateWidth := 300, glGuiCreateHeight := 35, glGuiCreateX := unset, glGuiCreateY := unset) {
-        glGuiCreateGuiObj := Gui("+AlwaysOnTop", glGuiCreateTitle)
-        glGuiCreateGuiObj.BackColor := "000000"
-        glGuiCreateGuiObj.SetFont("s9 cFFFFFF", "Microsoft YaHei")
+; Common_GUI_Create - 创建项目统一样式 GUI；参数：title=窗口标题，width=窗口宽度，height=窗口高度，x=可选横坐标，y=可选纵坐标。
+Common_GUI_Create(commonGUICreateTitle := "", commonGUICreateWidth := 300, commonGUICreateHeight := 35, commonGUICreateX := unset, commonGUICreateY := unset) {
+    commonGUICreateGuiObj := Gui("+AlwaysOnTop", commonGUICreateTitle)
+    commonGUICreateGuiObj.BackColor := "000000"
+    commonGUICreateGuiObj.SetFont("s9 cFFFFFF", "Microsoft YaHei")
 
-        if IsSet(glGuiCreateX) && IsSet(glGuiCreateY)
-            glGuiCreateGuiObj.Show("x" glGuiCreateX " y" glGuiCreateY " w" glGuiCreateWidth " h" glGuiCreateHeight " NA")
-        else
-            glGuiCreateGuiObj.Show("w" glGuiCreateWidth " h" glGuiCreateHeight " NA")
+    if IsSet(commonGUICreateX) && IsSet(commonGUICreateY)
+        commonGUICreateGuiObj.Show("x" commonGUICreateX " y" commonGUICreateY " w" commonGUICreateWidth " h" commonGUICreateHeight " NA")
+    else
+        commonGUICreateGuiObj.Show("w" commonGUICreateWidth " h" commonGUICreateHeight " NA")
 
-        WinSetTransparent(220, glGuiCreateGuiObj)
-        return {gui: glGuiCreateGuiObj, controls: []}
-    }
+    WinSetTransparent(220, commonGUICreateGuiObj)
+    return {gui: commonGUICreateGuiObj, controls: []}
+}
 
-    ; ★ GLGui.UpdateList：管理器专用显示逻辑。
-    ; ★ 当前索引显示红色，其余脚本显示白色。
-    ; ★ 这里只负责“怎么显示”，不决定当前脚本是谁。
-    static UpdateList(glGuiUpdateListState, glGuiUpdateListScripts, glGuiUpdateListCurrentIndex) {
-        if !glGuiUpdateListState
-            return 0
+; Common_GUI_UpdateList - 更新管理器脚本名称列表并突出当前项；参数：state=GUI 状态对象，scripts=脚本对象数组，currentIndex=当前脚本索引。
+Common_GUI_UpdateList(commonGUIUpdateListState, commonGUIUpdateListScripts, commonGUIUpdateListCurrentIndex) {
+    if !commonGUIUpdateListState
+        return 0
 
-        glGuiUpdateListGuiObj := glGuiUpdateListState.gui
-        glGuiUpdateListControls := glGuiUpdateListState.controls
-        glGuiUpdateListX := 8
-        glGuiUpdateListY := 9
+    commonGUIUpdateListGuiObj := commonGUIUpdateListState.gui
+    commonGUIUpdateListControls := commonGUIUpdateListState.controls
+    commonGUIUpdateListX := 8
+    commonGUIUpdateListY := 9
 
-        for glGuiUpdateListIndex, glGuiUpdateListItem in glGuiUpdateListScripts {
-            glGuiUpdateListName := glGuiUpdateListItem.name
+    for commonGUIUpdateListIndex, commonGUIUpdateListItem in commonGUIUpdateListScripts {
+        commonGUIUpdateListName := commonGUIUpdateListItem.name
 
-            if glGuiUpdateListIndex > glGuiUpdateListControls.Length {
-                glGuiUpdateListGuiObj.SetFont("s9 cFFFFFF", "Microsoft YaHei")
-                glGuiUpdateListControls.Push(glGuiUpdateListGuiObj.AddText("x" glGuiUpdateListX " y" glGuiUpdateListY, glGuiUpdateListName))
-            }
-
-            glGuiUpdateListControl := glGuiUpdateListControls[glGuiUpdateListIndex]
-            glGuiUpdateListColor := glGuiUpdateListIndex = glGuiUpdateListCurrentIndex ? "FF0000" : "FFFFFF"
-
-            glGuiUpdateListControl.Text := glGuiUpdateListName
-            glGuiUpdateListControl.SetFont("c" glGuiUpdateListColor)
-            glGuiUpdateListControl.Move(glGuiUpdateListX, glGuiUpdateListY)
-            glGuiUpdateListControl.Visible := true
-
-            glGuiUpdateListControl.GetPos(&glGuiUpdateListControlX, &glGuiUpdateListControlY, &glGuiUpdateListControlWidth, &glGuiUpdateListControlHeight)
-            glGuiUpdateListX += glGuiUpdateListControlWidth + 8
+        if commonGUIUpdateListIndex > commonGUIUpdateListControls.Length {
+            commonGUIUpdateListGuiObj.SetFont("s9 cFFFFFF", "Microsoft YaHei")
+            commonGUIUpdateListControls.Push(commonGUIUpdateListGuiObj.AddText("x" commonGUIUpdateListX " y" commonGUIUpdateListY, commonGUIUpdateListName))
         }
 
-        Loop glGuiUpdateListControls.Length - glGuiUpdateListScripts.Length {
-            glGuiUpdateListHiddenIndex := glGuiUpdateListScripts.Length + A_Index
-            glGuiUpdateListControls[glGuiUpdateListHiddenIndex].Visible := false
-        }
+        commonGUIUpdateListControl := commonGUIUpdateListControls[commonGUIUpdateListIndex]
+        commonGUIUpdateListColor := commonGUIUpdateListIndex = commonGUIUpdateListCurrentIndex ? "FF0000" : "FFFFFF"
 
-        return glGuiUpdateListState
+        commonGUIUpdateListControl.Text := commonGUIUpdateListName
+        commonGUIUpdateListControl.SetFont("c" commonGUIUpdateListColor)
+        commonGUIUpdateListControl.Move(commonGUIUpdateListX, commonGUIUpdateListY)
+        commonGUIUpdateListControl.Visible := true
+
+        commonGUIUpdateListControl.GetPos(&commonGUIUpdateListControlX, &commonGUIUpdateListControlY, &commonGUIUpdateListControlWidth, &commonGUIUpdateListControlHeight)
+        commonGUIUpdateListX += commonGUIUpdateListControlWidth + 8
     }
+
+    Loop commonGUIUpdateListControls.Length - commonGUIUpdateListScripts.Length {
+        commonGUIUpdateListHiddenIndex := commonGUIUpdateListScripts.Length + A_Index
+        commonGUIUpdateListControls[commonGUIUpdateListHiddenIndex].Visible := false
+    }
+
+    return commonGUIUpdateListState
 }
