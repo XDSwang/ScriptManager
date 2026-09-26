@@ -211,7 +211,7 @@ Lib/Input/InputControl.ahk
 - Input_InputControl_StartGuard() = 完整公共函数名称。
 
 因此禁止：
-- Input_InputControl_StartGuard()
+- Common_InputControl_StartGuard()
 - Input_StartGuard()
 - StartGuard()
 
@@ -724,10 +724,19 @@ Lib/File/FileControl.ahk
 A_ScriptDir\Error.log
 ```
 
-公共日志函数的命名必须遵守最高优先级公共库命名规则，即：
+公共库函数的命名必须遵守“分类_具体脚本名称_具体功能”的最高优先级规则。具体分类取决于公共库实际所在能力目录：
 
 ```text
 Common_具体脚本名称_具体功能
+Action_具体脚本名称_具体功能
+Input_具体脚本名称_具体功能
+File_具体脚本名称_具体功能
+```
+
+例如 `Lib/Common/Log.ahk` 中的错误记录能力使用：
+
+```text
+Common_Log_Error()
 ```
 
 例如 `Lib/Common/Log.ahk` 中的错误记录能力应使用：
@@ -747,7 +756,7 @@ Common_Log_Error()
 新增或修改功能时：
 
 1. **先确定真实具体脚本名称。**
-2. **如果属于公共库，优先套用 `Common_具体脚本名称_具体功能`。**
+2. **如果属于公共库，必须按照真实能力分类套用 `分类_具体脚本名称_具体功能`；例如 `Common_`、`Action_`、`Input_`、`File_`。**
 3. 如果属于业务脚本，使用 `具体脚本名称_具体功能`。
 4. 先判断公共库是否已有能力。
 5. 有则直接调用。
