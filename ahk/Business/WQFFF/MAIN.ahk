@@ -8,7 +8,8 @@
 #Include Task_Process.ahk
 
 WQFFF_Main() {
-    wqfffMainGui := GLGui.Create("W Q F 控制", 300, 35, 0, 0)
+    wqfffMainGuiState := GLGui.Create("W Q F 控制", 300, 35, 0, 0)
+    wqfffMainGui := wqfffMainGuiState.gui
     wqfffMainStatusText := wqfffMainGui.AddText("x10 y7 w280 h20 Center", "● 待机 | F6 开启")
     wqfffMainRunning := false
     wqfffMainFInterval := 100
