@@ -330,7 +330,7 @@ Lib/File/FileControl.ahk
 WQFFF_Start()
 
 公共库函数：
-Common_InputControl_StartGuard()
+Input_InputControl_StartGuard()
 
 函数参数：
 wqfffStartRunning
@@ -609,7 +609,7 @@ ahk/Lib/Input/InputControl.ahk
 
 ```ahk
 shiftMainControlKeys := ["F6", "F7"]
-shiftMainInputGuard := Common_InputControl_CreateGuard(shiftMainControlKeys)
+shiftMainInputGuard := Input_InputControl_CreateGuard(shiftMainControlKeys)
 ```
 
 这里的控制键是本脚本用于启动、暂停、退出等控制功能的按键。控制键会被输入保护忽略，因此：
@@ -724,10 +724,10 @@ Lib/File/FileControl.ahk
 A_ScriptDir\Error.log
 ```
 
-公共日志函数的命名必须遵守最高优先级公共库命名规则，即：
+公共日志函数的命名必须遵守其真实公共库归属规则。`Log.ahk` 位于 `Lib/Common/`，因此使用：
 
 ```text
-Common_具体脚本名称_具体功能
+Common_Log_具体功能
 ```
 
 例如 `Lib/Common/Log.ahk` 中的错误记录能力应使用：
@@ -747,8 +747,8 @@ Common_Log_Error()
 新增或修改功能时：
 
 1. **先确定真实具体脚本名称。**
-2. **如果属于公共库，优先套用 `Common_具体脚本名称_具体功能`。**
-3. 如果属于业务脚本，使用 `具体脚本名称_具体功能`。
+2. 判断是否只在同级目录内部使用；是则使用 `具体脚本名称_具体功能`。
+3. 如果需要跨目录引用，则使用 `分类_具体脚本名称_具体功能`；存在多级真实分类时完整表达真实归属层级。
 4. 先判断公共库是否已有能力。
 5. 有则直接调用。
 6. 没有且属于当前脚本专用动作，则写入当前脚本 Action。

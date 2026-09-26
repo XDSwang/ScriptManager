@@ -11,7 +11,7 @@ WQFFF_Start(&wqfffStartRunning, &wqfffStartFInterval, &wqfffStartPressTimer, wqf
     if wqfffStartRunning
         return
 
-    Common_InputControl_StartGuard(
+    Input_InputControl_StartGuard(
         wqfffStartInputGuard,
         (*) => WQFFF_PauseForInput(&wqfffStartRunning, wqfffStartPressTimer, wqfffStartStatusText),
         (*) => WQFFF_Start(&wqfffStartRunning, wqfffStartFInterval, wqfffStartPressTimer, wqfffStartStatusText, wqfffStartInputGuard)
@@ -25,7 +25,7 @@ WQFFF_Start(&wqfffStartRunning, &wqfffStartFInterval, &wqfffStartPressTimer, wqf
 
 ; ★ WQFFF_Stop：F7、GL 切换、GL F8 共用的停止流程。
 WQFFF_Stop(&wqfffStopRunning, wqfffStopPressTimer, wqfffStopStatusText, wqfffStopInputGuard) {
-    Common_InputControl_StopGuard(wqfffStopInputGuard)
+    Input_InputControl_StopGuard(wqfffStopInputGuard)
     WQFFF_ReleaseKeys(&wqfffStopRunning, wqfffStopPressTimer, wqfffStopInputGuard)
     WQFFF_UpdateStatus(wqfffStopStatusText, "● 待机 | F6 开启")
 }
