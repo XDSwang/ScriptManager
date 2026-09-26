@@ -30,7 +30,7 @@ GL_StartFirst(glStartScripts, &glStartCurrentIndex, glStartManagerGuiState) {
 
 GL_StopCurrent(glStopScripts, glStopCurrentIndex) {
     SplitPath glStopScripts[glStopCurrentIndex].path, &glStopCurrentFileName, &glStopCurrentDir
-    glStopCurrentHwndFile := glStopCurrentDir "\\" glStopCurrentFileName ".txt"
+    glStopCurrentHwndFile := glStopCurrentDir "" glStopCurrentFileName ".txt"
 
     if !FileExist(glStopCurrentHwndFile)
         return
@@ -49,7 +49,7 @@ GL_RequestExitCurrent(glRequestExitScripts, glRequestExitCurrentIndex, glRequest
         return
 
     SplitPath glRequestExitScripts[glRequestExitCurrentIndex].path, &glRequestExitFileName, &glRequestExitDir
-    glRequestExitHwndFile := glRequestExitDir "\\" glRequestExitFileName ".txt"
+    glRequestExitHwndFile := glRequestExitDir "" glRequestExitFileName ".txt"
 
     if !FileExist(glRequestExitHwndFile)
         return
