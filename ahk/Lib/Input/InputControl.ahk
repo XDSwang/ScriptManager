@@ -36,7 +36,7 @@ Input_StopGuard(inputStopGuardState) {
     return true
 }
 
-; Input_CheckGuard - 按当前状态检查是否出现新的物理输入，并触发暂停或恢复回调；参数：state=输入检测状态对象，interferenceCallback=检测到新增输入时的回调，resumeCallback=干扰解除后的恢复回调。
+; Input_CheckGuard - 按当前状态检查是否出现新的物理输入，并触发暂停或恢复回调；参数：state=输入检测状态对象，interferenceCallback=检测到新增输入时的回调，resumeCallback=新增输入消失后的恢复回调。
 Input_CheckGuard(inputCheckGuardState, inputCheckGuardInterferenceCallback, inputCheckGuardResumeCallback) {
     if !inputCheckGuardState.monitoring
         return false
@@ -75,7 +75,7 @@ Input_CapturePhysicalKeys() {
     return inputCapturePhysicalKeysMap
 }
 
-; Input_FindNewPhysicalInput - 根据启动基线查找新增物理输入，并同步移除已经释放的基线按键；参数：baseline=启动时的物理按键基线。
+; Input_FindNewPhysicalInput - 根据启动基线查找新增物理输入，并忽略 F6/F7 控制键；参数：baseline=启动时的物理按键基线。
 Input_FindNewPhysicalInput(inputFindNewPhysicalInputBaseline) {
     if Input_IsImeOpen()
         return false
@@ -91,7 +91,15 @@ Input_FindNewPhysicalInput(inputFindNewPhysicalInputBaseline) {
     for inputFindNewPhysicalInputKey in inputFindNewPhysicalInputReleasedKeys
         inputFindNewPhysicalInputBaseline.Delete(inputFindNewPhysicalInputKey)
 
+    inputFindNewPhysicalInputIgnoredKeys := Map(
+        "vk75", true,
+        "vk76", true
+    )
+
     for inputFindNewPhysicalInputKey in inputFindNewPhysicalInputCurrent {
+        if inputFindNewPhysicalInputIgnoredKeys.Has(inputFindNewPhysicalInputKey)
+            continue
+
         if !inputFindNewPhysicalInputBaseline.Has(inputFindNewPhysicalInputKey)
             return true
     }
