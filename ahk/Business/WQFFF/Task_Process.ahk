@@ -6,7 +6,7 @@ WQFFF_Start(&wqfffStartRunning, wqfffStartFInterval, wqfffStartPressTimer, wqfff
 
     Input_StartGuard(
         wqfffStartInputGuard,
-        (*) => WQFFF_PauseForInput(&wqfffStartRunning, wqfffStartPressTimer, wqfffStartStatusText),
+        (*) => WQFFF_PauseForInput(&wqfffStartRunning, &wqfffStartPressTimer, wqfffStartStatusText),
         (*) => WQFFF_Start(&wqfffStartRunning, wqfffStartFInterval, wqfffStartPressTimer, wqfffStartStatusText, wqfffStartInputGuard)
     )
 
@@ -19,6 +19,7 @@ WQFFF_Start(&wqfffStartRunning, wqfffStartFInterval, wqfffStartPressTimer, wqfff
 WQFFF_Stop(&wqfffStopRunning, wqfffStopPressTimer, wqfffStopStatusText, wqfffStopInputGuard) {
     Input_StopGuard(wqfffStopInputGuard)
     WQFFF_ReleaseKeys(&wqfffStopRunning, wqfffStopPressTimer, wqfffStopInputGuard)
+    Input_WaitPhysicalRelease()
     WQFFF_UpdateStatus(wqfffStopStatusText, "● 待机 | F6 开启")
 }
 
@@ -46,7 +47,6 @@ WQFFF_WriteHwnd(wqfffWriteHwndFile, wqfffWriteHwndGui) {
 WQFFF_Exit(wqfffExitHwndFile, &wqfffExitRunning, wqfffExitPressTimer, wqfffExitInputGuard) {
     Input_StopGuard(wqfffExitInputGuard)
     WQFFF_ReleaseKeys(&wqfffExitRunning, wqfffExitPressTimer, wqfffExitInputGuard)
-    Input_WaitPhysicalRelease()
 
     if FileExist(wqfffExitHwndFile)
         FileDelete wqfffExitHwndFile
