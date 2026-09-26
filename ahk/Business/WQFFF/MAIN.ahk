@@ -4,6 +4,7 @@
 
 #Include ../../Lib/Common/GUI.ahk
 #Include ../../Lib/Common/Message.ahk
+#Include ../../Lib/Common/Log.ahk
 #Include ../../Lib/Input/InputControl.ahk
 #Include Task_Action.ahk
 #Include Task_Process.ahk
@@ -22,7 +23,7 @@ WQFFF_Main() {
 
     Hotkey("*F6", (*) => WQFFF_Start(&wqfffMainRunning, wqfffMainFInterval, wqfffMainPressTimer, wqfffMainStatusText, wqfffMainInputGuard))
     Hotkey("*F7", (*) => WQFFF_Stop(&wqfffMainRunning, wqfffMainPressTimer, wqfffMainStatusText, wqfffMainInputGuard))
-    OnMessage(0xB001, (*) => WQFFF_Exit(wqfffMainHwndFile, &wqfffMainRunning, wqfffMainPressTimer, wqfffMainInputGuard, wqfffMainStatusText))
+    OnMessage(0xB001, (wParam, lParam, msg, hwnd) => WQFFF_Exit(wParam, wqfffMainHwndFile, &wqfffMainRunning, wqfffMainPressTimer, wqfffMainInputGuard, wqfffMainStatusText))
     OnExit((*) => WQFFF_ReleaseKeys(&wqfffMainRunning, wqfffMainPressTimer, wqfffMainInputGuard))
 }
 
