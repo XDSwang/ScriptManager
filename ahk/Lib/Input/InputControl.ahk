@@ -6,6 +6,7 @@ Input_CreateGuard(inputCreateGuardControlKeys := []) {
         monitoring: false,
         paused: false,
         baseline: Map(),
+        interferenceKeys: Map(),
         ignoredKeys: Map(),
         timer: 0
     }
@@ -19,7 +20,7 @@ Input_CreateGuard(inputCreateGuardControlKeys := []) {
     return inputCreateGuardState
 }
 
-; Input_StartGuard - 记录启动瞬间的物理按键并开始检测新增用户输入；参数：state=输入检测状态对象，interferenceCallback=检测到新增物理输入时调用的回调，resumeCallback=新增输入消失后调用的恢复回调。
+; Input_StartGuard - 记录启动瞬间的物理按键并开始检测新增用户输入；参数：state=输入检测状态对象，interferenceCallback=检测到新增物理输入时调用的回调，resumeCallback=记录的干扰按键全部抬起后调用的恢复回调。
 Input_StartGuard(inputStartGuardState, inputStartGuardInterferenceCallback, inputStartGuardResumeCallback) {
     Input_StopGuard(inputStartGuardState)
 
@@ -41,31 +42,41 @@ Input_StopGuard(inputStopGuardState) {
 
     inputStopGuardState.timer := 0
     inputStopGuardState.baseline := Map()
+    inputStopGuardState.interferenceKeys := Map()
     return true
 }
 
-; Input_CheckGuard - 按当前状态检查是否出现新的物理输入，并触发暂停或恢复回调；参数：state=输入检测状态对象，interferenceCallback=检测到新增输入时的回调，resumeCallback=新增输入消失后的恢复回调。
+; Input_CheckGuard - 检测新的物理输入并记录干扰按键，只在已记录的干扰按键全部抬起后触发恢复；参数：state=输入检测状态对象，interferenceCallback=首次发现用户干扰时执行的回调，resumeCallback=全部干扰按键抬起后执行的恢复回调。
 Input_CheckGuard(inputCheckGuardState, inputCheckGuardInterferenceCallback, inputCheckGuardResumeCallback) {
     if !inputCheckGuardState.monitoring
         return false
 
-    inputCheckGuardNewInput := Input_FindNewPhysicalInput(inputCheckGuardState.baseline, inputCheckGuardState.ignoredKeys)
+    inputCheckGuardCurrent := Input_CapturePhysicalKeys()
 
     if !inputCheckGuardState.paused {
-        if inputCheckGuardNewInput {
+        inputCheckGuardNewKeys := Input_FindNewPhysicalKeys(inputCheckGuardState.baseline, inputCheckGuardCurrent, inputCheckGuardState.ignoredKeys)
+
+        if inputCheckGuardNewKeys.Count {
+            for inputCheckGuardKey in inputCheckGuardNewKeys
+                inputCheckGuardState.interferenceKeys[inputCheckGuardKey] := true
+
             inputCheckGuardState.paused := true
             inputCheckGuardInterferenceCallback.Call()
+            return true
         }
-        return inputCheckGuardNewInput
+
+        return false
     }
 
-    if !inputCheckGuardNewInput {
+    inputCheckGuardReleasedKeys := Input_RemoveReleasedInterferenceKeys(inputCheckGuardState.interferenceKeys, inputCheckGuardCurrent)
+
+    if !inputCheckGuardState.interferenceKeys.Count {
         inputCheckGuardState.paused := false
         inputCheckGuardResumeCallback.Call()
         return true
     }
 
-    return false
+    return inputCheckGuardReleasedKeys.Count > 0
 }
 
 ; Input_CapturePhysicalKeys - 获取当前所有处于物理按下状态的虚拟键；参数：无。
@@ -83,34 +94,36 @@ Input_CapturePhysicalKeys() {
     return inputCapturePhysicalKeysMap
 }
 
-; Input_FindNewPhysicalInput - 根据启动基线查找新增物理输入，并忽略调用方声明的控制键；参数：baseline=启动时的物理按键基线，ignoredKeys=需要忽略的虚拟键名称 Map，可省略。
-Input_FindNewPhysicalInput(inputFindNewPhysicalInputBaseline, inputFindNewPhysicalInputIgnoredKeys := unset) {
+; Input_FindNewPhysicalKeys - 根据启动基线和当前按键查找新增物理输入，并忽略调用方声明的控制键；参数：baseline=启动时的物理按键基线，currentKeys=当前物理按键 Map，ignoredKeys=需要忽略的虚拟键名称 Map。
+Input_FindNewPhysicalKeys(inputFindNewPhysicalKeysBaseline, inputFindNewPhysicalKeysCurrentKeys, inputFindNewPhysicalKeysIgnoredKeys) {
+    inputFindNewPhysicalKeysResult := Map()
+
     if Input_IsImeOpen()
-        return false
+        return inputFindNewPhysicalKeysResult
 
-    inputFindNewPhysicalInputCurrent := Input_CapturePhysicalKeys()
-    inputFindNewPhysicalInputReleasedKeys := []
-
-    for inputFindNewPhysicalInputKey in inputFindNewPhysicalInputBaseline {
-        if !inputFindNewPhysicalInputCurrent.Has(inputFindNewPhysicalInputKey)
-            inputFindNewPhysicalInputReleasedKeys.Push(inputFindNewPhysicalInputKey)
-    }
-
-    for inputFindNewPhysicalInputKey in inputFindNewPhysicalInputReleasedKeys
-        inputFindNewPhysicalInputBaseline.Delete(inputFindNewPhysicalInputKey)
-
-    if !IsSet(inputFindNewPhysicalInputIgnoredKeys)
-        inputFindNewPhysicalInputIgnoredKeys := Map()
-
-    for inputFindNewPhysicalInputKey in inputFindNewPhysicalInputCurrent {
-        if inputFindNewPhysicalInputIgnoredKeys.Has(inputFindNewPhysicalInputKey)
+    for inputFindNewPhysicalKeysKey in inputFindNewPhysicalKeysCurrentKeys {
+        if inputFindNewPhysicalKeysIgnoredKeys.Has(inputFindNewPhysicalKeysKey)
             continue
 
-        if !inputFindNewPhysicalInputBaseline.Has(inputFindNewPhysicalInputKey)
-            return true
+        if !inputFindNewPhysicalKeysBaseline.Has(inputFindNewPhysicalKeysKey)
+            inputFindNewPhysicalKeysResult[inputFindNewPhysicalKeysKey] := true
     }
 
-    return false
+    return inputFindNewPhysicalKeysResult
+}
+
+; Input_RemoveReleasedInterferenceKeys - 从干扰按键集合中移除已经物理抬起的按键；参数：interferenceKeys=当前记录的干扰按键 Map，currentKeys=当前物理按键 Map。
+Input_RemoveReleasedInterferenceKeys(inputRemoveReleasedInterferenceKeysMap, inputRemoveReleasedInterferenceKeysCurrentKeys) {
+    inputRemoveReleasedInterferenceKeysReleased := Map()
+
+    for inputRemoveReleasedInterferenceKeysKey in inputRemoveReleasedInterferenceKeysMap {
+        if !inputRemoveReleasedInterferenceKeysCurrentKeys.Has(inputRemoveReleasedInterferenceKeysKey) {
+            inputRemoveReleasedInterferenceKeysReleased[inputRemoveReleasedInterferenceKeysKey] := true
+            inputRemoveReleasedInterferenceKeysMap.Delete(inputRemoveReleasedInterferenceKeysKey)
+        }
+    }
+
+    return inputRemoveReleasedInterferenceKeysReleased
 }
 
 ; Input_IsImeOpen - 判断当前活动窗口是否处于开启输入法状态；参数：无。
