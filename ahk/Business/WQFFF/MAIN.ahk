@@ -17,7 +17,7 @@ if FileExist(glFile)
 FileAppend(myGui.Hwnd, glFile)
 
 OnMessage(0xB001, GL_Exit)
-OnExit(ReleaseKeys)
+OnExit(ReleaseWQ)
 
 *F6::
 {
@@ -32,7 +32,10 @@ OnExit(ReleaseKeys)
 
 *F7::
 {
-    ReleaseKeys()
+    ReleaseWQ()
+    global running
+    running := false
+    SetTimer(PressF, 0)
     status.Text := "● 待机 | F6 开启"
 }
 
@@ -44,17 +47,10 @@ PressF()
     Send "f"
 }
 
-ReleaseKeys(*)
-{
-    global running
-    running := false
-    SetTimer(PressF, 0)
-    Send "{w up}{q up}"
-}
-
 GL_Exit(*)
 {
-    ReleaseKeys()
+    ReleaseWQ()
+    SetTimer(PressF, 0)
     Sleep 100
     ExitApp
 }
