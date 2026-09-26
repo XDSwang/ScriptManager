@@ -1,7 +1,11 @@
 #Requires AutoHotkey v2.0
 
 class GLGui {
-    ; GLGui.Create - 创建统一的置顶、黑底、透明且不激活前台的 GUI；参数：title=窗口标题，width=窗口宽度，height=窗口高度，x=可选横坐标，y=可选纵坐标。
+    ; ★ GLGui.Create：所有管理器/子脚本 GUI 的统一模板。
+    ; ★ AlwaysOnTop = 始终置顶。
+    ; ★ 黑底 + 透明 = 统一外观。
+    ; ★ NA = ★显示窗口但不激活它，避免切换子脚本后键盘焦点跑到 AHK GUI。
+    ; ★ 以后新增子脚本时，通常只改标题和业务状态文字，不要重复实现 GUI 样式。
     static Create(glGuiCreateTitle := "", glGuiCreateWidth := 300, glGuiCreateHeight := 35, glGuiCreateX := unset, glGuiCreateY := unset) {
         glGuiCreateGuiObj := Gui("+AlwaysOnTop", glGuiCreateTitle)
         glGuiCreateGuiObj.BackColor := "000000"
@@ -16,7 +20,9 @@ class GLGui {
         return {gui: glGuiCreateGuiObj, controls: []}
     }
 
-    ; GLGui.UpdateList - 更新 GUI 中的脚本名称列表并设置当前项颜色；参数：state=GLGui.Create() 返回状态对象，scripts=脚本对象数组，currentIndex=当前脚本索引。
+    ; ★ GLGui.UpdateList：管理器专用显示逻辑。
+    ; ★ 当前索引显示红色，其余脚本显示白色。
+    ; ★ 这里只负责“怎么显示”，不决定当前脚本是谁。
     static UpdateList(glGuiUpdateListState, glGuiUpdateListScripts, glGuiUpdateListCurrentIndex) {
         if !glGuiUpdateListState
             return 0
