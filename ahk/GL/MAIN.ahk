@@ -7,14 +7,16 @@
 #Include GL_Process.ahk
 #Include GL_Action.ahk
 
-scriptFolder := A_ScriptDir "\..\Business"
-scripts := []
-current := 0
-managerGui := 0
+GL_Main() {
+    glMainScriptFolder := A_ScriptDir "\..\Business"
+    glMainScripts := GL_LoadScripts(glMainScriptFolder)
+    glMainCurrentIndex := 0
+    glMainManagerGui := GL_Show()
 
-GL_LoadScripts()
-GL_Show()
-GL_StartFirst()
+    GL_StartFirst(glMainScripts, &glMainCurrentIndex, glMainManagerGui)
 
-^Up::GL_SwitchScript(1)
-^Down::GL_SwitchScript(-1)
+    Hotkey("^Up", (*) => GL_SwitchScript(1, glMainScripts, &glMainCurrentIndex, glMainManagerGui))
+    Hotkey("^Down", (*) => GL_SwitchScript(-1, glMainScripts, &glMainCurrentIndex, glMainManagerGui))
+}
+
+GL_Main()
