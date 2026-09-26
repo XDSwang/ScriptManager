@@ -136,6 +136,232 @@ Action / 公共库
 
 不要通过隐藏的全局变量或共享脚本变量传递状态。
 
+### 3.5 ★ 全项目函数命名原则
+
+**整个 AHK 项目的所有自定义函数，统一采用“所属模块/脚本名称 + 实际功能”的命名原则。**
+
+这不是只针对公共库的规范，而是**MAIN、Process、Action、GL、Business、Lib 以及以后新增的所有扩展模块全部适用**。
+
+基本形式：
+
+```text
+所属模块名称_实际功能
+```
+
+例如：
+
+```ahk
+WQFFF_Start()
+WQFFF_Stop()
+WQFFF_Exit()
+
+SHIFT_Start()
+SHIFT_Stop()
+SHIFT_Exit()
+
+GL_StartFirst()
+GL_SwitchScript()
+GL_ExitManager()
+
+Input_StartGuard()
+Input_StopGuard()
+
+GLGui_Create()
+GLGui_UpdateList()
+```
+
+#### 3.5.1 为什么必须这样命名
+
+项目会不断增加业务脚本和功能扩展。
+
+如果不同目录、不同脚本都使用：
+
+```text
+Start()
+Stop()
+Exit()
+Update()
+Init()
+Process()
+Action()
+ReleaseKeys()
+```
+
+那么随着 `#Include` 数量增加，会产生以下问题：
+
+- 看到调用处无法立即判断函数属于哪个脚本。
+- 同目录新增脚本时容易出现同名函数。
+- 不同模块之间容易发生命名冲突。
+- 后续扩展功能时需要重新搜索函数定义才能确认归属。
+- 阅读调用链时无法从函数名直接看出业务边界。
+- 代码复制、拆分、合并时更容易发生函数名冲突。
+
+因此，**函数名本身必须携带所属模块信息**，让调用处在不跳转定义的情况下就能判断“谁的函数”。
+
+例如：
+
+```ahk
+; 一眼可以知道是 WQFFF 的启动流程
+WQFFF_Start()
+
+; 一眼可以知道是 SHIFT 的停止流程
+SHIFT_Stop()
+
+; 一眼可以知道是输入保护库的能力
+Input_StartGuard()
+```
+
+#### 3.5.2 业务脚本命名规则
+
+业务目录名称就是业务函数的第一命名段。
+
+例如目录：
+
+```text
+Business/WQFFF/
+Business/SHIFT/
+```
+
+对应函数：
+
+```text
+WQFFF_...
+SHIFT_...
+```
+
+因此不能写成：
+
+```ahk
+Start()
+Stop()
+Exit()
+ReleaseKeys()
+```
+
+必须写成：
+
+```ahk
+WQFFF_Start()
+WQFFF_Stop()
+WQFFF_Exit()
+WQFFF_ReleaseKeys()
+
+SHIFT_Start()
+SHIFT_Stop()
+SHIFT_Exit()
+SHIFT_ReleaseKeys()
+```
+
+#### 3.5.3 Process 与 Action 也必须遵守
+
+文件职责可以继续区分：
+
+```text
+Task_Process.ahk
+Task_Action.ahk
+```
+
+但**函数名称不能依赖文件名来区分归属**。
+
+例如 WQFFF：
+
+```text
+Task_Process.ahk
+→ WQFFF_Start()
+→ WQFFF_Stop()
+→ WQFFF_Exit()
+
+Task_Action.ahk
+→ WQFFF_Down()
+→ WQFFF_Up()
+→ WQFFF_PressF()
+→ WQFFF_ReleaseKeys()
+```
+
+这样即使两个文件同时被 MAIN Include，也不会因为都存在 `Start()` / `Stop()` 而失去归属信息。
+
+#### 3.5.4 公共库也遵守同一原则
+
+公共库不是例外。
+
+公共库函数的第一命名段应使用**公共模块/能力名称**，而不是使用模糊的通用函数名。
+
+例如：
+
+```text
+Input_StartGuard()
+Input_StopGuard()
+
+GLGui_Create()
+GLGui_UpdateList()
+
+GLMsg_SendExit()
+```
+
+如果以后新增：
+
+```text
+File/
+Window/
+Timer/
+Keyboard/
+```
+
+也必须使用明确的模块前缀，例如：
+
+```text
+File_ReadText()
+File_WriteText()
+Window_GetHwnd()
+Timer_Start()
+Keyboard_SendKey()
+```
+
+具体前缀应与所属能力模块一致。
+
+#### 3.5.5 新增扩展时的原则
+
+以后新增任何业务目录、功能目录或公共能力时：
+
+1. **先确定模块名称/业务名称。**
+2. **再确定函数前缀。**
+3. 所有属于该模块的自定义函数统一使用该前缀。
+4. 后面的部分再描述具体功能。
+5. 不因为函数简单就省略模块前缀。
+6. 不因为当前只有一个脚本就使用 `Start()`、`Stop()` 等通用名称。
+7. 不依赖“现在没有重名”作为省略前缀的理由。
+
+核心原则：
+
+> **先定义归属，再定义功能；函数名必须同时表达“谁的函数”和“做什么”。**
+
+因此，本项目以后新增扩展时，**命名空间边界必须在写函数之前确定**，而不是等出现同名函数以后再补前缀。
+
+### 3.6 变量与函数命名的共同原则
+
+函数命名和变量命名遵循同一个基本思想：
+
+```text
+先表达归属
++
+再表达实际含义
+```
+
+例如：
+
+```text
+函数：
+WQFFF_Start()
+
+函数参数：
+wqfffStartRunning
+
+函数外状态（确实必须存在时）：
+WQFFF_Running
+```
+
+目标是让代码在脱离定义位置后，单看调用、变量或数据，也能够判断其所属范围和实际用途。
+
 ## 4. 模块职责
 
 ### MAIN
@@ -331,7 +557,7 @@ F8：
 每个受管理子脚本使用：
 
 ```text
-A_ScriptDir "\" A_ScriptName ".txt"
+A_ScriptDir "\\" A_ScriptName ".txt"
 ```
 
 例如入口为：
@@ -510,6 +736,9 @@ Lib/Action/Window.ahk
 Lib/File/FileControl.ahk
 ```
 
+**文件名决定模块归属，函数名必须再次明确模块归属。**  
+不能因为文件名已经明确，就在函数名中省略所属模块前缀。
+
 ## 14. 日志规范
 
 每个脚本的日志文件：
@@ -528,13 +757,18 @@ A_ScriptDir\Error.log
 
 新增或修改功能时：
 
-1. 先判断公共库是否已有能力。
-2. 有则直接调用。
-3. 没有且属于当前脚本专用动作，则写入当前脚本 Action。
-4. 由 Process 负责流程组合。
-5. MAIN 负责入口。
-6. 状态优先保持在函数局部。
-7. 优先使用参数和返回值传递数据。
-8. 不为了调用方便制造全局变量。
-9. 公共函数增加“一条作用 + 参数”源码注释。
-10. 在公共库函数总文档中同步真实函数说明。
+1. 先确定功能属于哪个模块/业务脚本。
+2. 先确定该模块的函数命名前缀。
+3. 再判断公共库是否已有能力。
+4. 有则直接调用。
+5. 没有且属于当前脚本专用动作，则写入当前脚本 Action。
+6. 由 Process 负责流程组合。
+7. MAIN 负责入口。
+8. 状态优先保持在函数局部。
+9. 优先使用参数和返回值传递数据。
+10. 优先让函数名表达“模块 + 功能”，禁止为了省字使用 `Start()`、`Stop()`、`Exit()` 等无归属通用名称。
+11. 不为了调用方便制造全局变量。
+12. 公共函数增加“一条作用 + 参数”源码注释。
+13. 在公共库函数总文档中同步真实函数说明。
+14. 新增扩展时，先确定命名边界，再开始写函数。
+
