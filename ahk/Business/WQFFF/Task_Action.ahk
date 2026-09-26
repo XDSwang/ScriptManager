@@ -20,7 +20,8 @@ WQFFF_UpdateStatus(wqfffUpdateStatusText, wqfffUpdateStatusValue) {
     wqfffUpdateStatusText.Text := wqfffUpdateStatusValue
 }
 
-WQFFF_ReleaseKeys(&wqfffReleaseRunning, wqfffReleasePressTimer) {
+WQFFF_ReleaseKeys(&wqfffReleaseRunning, wqfffReleasePressTimer, wqfffReleaseInputGuard) {
+    Input_StopGuard(wqfffReleaseInputGuard)
     SetTimer(wqfffReleasePressTimer, 0)
     SendEvent "{w up}"
     SendEvent "{q up}"
