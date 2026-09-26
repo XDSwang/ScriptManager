@@ -16,7 +16,7 @@
 ; ★ → 注册 GL 的 0xB001 退出消息
 ; ★ → 注册 OnExit，保证 W/Q/F 和 Timer 最终被清理
 ;
-; ★ F6：*F6 → WQFFF_Start → Input_StartGuard → WQFFF_Down → 启动 F 定时器 → 更新状态。
+; ★ F6：*F6 → WQFFF_Start → Common_InputControl_StartGuard → WQFFF_Down → 启动 F 定时器 → 更新状态。
 ; ★ F7：*F7 → WQFFF_Stop → 停止输入保护/Timer → WQFFF_ReleaseKeys → W/Q/F 全部释放 → 待机。
 ; ★ 用户操作：InputGuard 检测到新增物理输入 → WQFFF_PauseForInput → 停止 Timer、释放 W/Q/F → 所有记录干扰键释放后自动 WQFFF_Start。
 ; ★ GL 切换 / F8：GL 发 0xB001 → WQFFF_Exit → WQFFF_Stop → 删除 HWND 文件 → ExitApp。
@@ -25,7 +25,7 @@
 
 WQFFF_Main() {
     ; ★ MAIN 负责初始化和接线；W/Q/F 的实际动作与运行流程分别放在 Action / Process。
-    wqfffMainGuiState := GLGui.Create("W Q F 控制", 300, 35, 0, 0)
+    wqfffMainGuiState := Common_GUI_Create("W Q F 控制", 300, 35, 0, 0)
     wqfffMainGui := wqfffMainGuiState.gui
     wqfffMainStatusText := wqfffMainGui.AddText("x10 y7 w280 h20 Center", "● 待机 | F6 开启")
     wqfffMainRunning := false
@@ -35,7 +35,7 @@ WQFFF_Main() {
 
     ; ★ 控制键必须加入忽略列表，避免 F6/F7 被输入保护误判成用户干扰。
     wqfffMainControlKeys := ["F6", "F7"]
-    wqfffMainInputGuard := Input_CreateGuard(wqfffMainControlKeys)
+    wqfffMainInputGuard := Common_InputControl_CreateGuard(wqfffMainControlKeys)
 
     ; ★ 写入本脚本 GUI HWND，供 GL 管理器发送退出消息。
     WQFFF_WriteHwnd(wqfffMainHwndFile, wqfffMainGui)
