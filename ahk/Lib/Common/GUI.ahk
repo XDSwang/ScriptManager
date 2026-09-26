@@ -25,7 +25,8 @@ class GLGui {
             color := index = currentIndex ? "FF0000" : "FFFFFF"
             gui.SetFont("s9 c" color, "Microsoft YaHei")
             control := gui.AddText("x" x " y" y, item.name)
-            x += control.GetPos(&cx, &cy, &cw, &ch), cw + 8
+            control.GetPos(&cx, &cy, &cw, &ch)
+            x += cw + 8
         }
 
         gui.Show("w300 h35")
