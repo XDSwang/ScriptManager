@@ -8,6 +8,7 @@ WQFFF_Down() {
 WQFFF_Up() {
     SendEvent "{w up}"
     SendEvent "{q up}"
+    SendEvent "{f up}"
 }
 
 WQFFF_PressF() {
@@ -15,7 +16,14 @@ WQFFF_PressF() {
     SendEvent "{f up}"
 }
 
-WQFFF_UpdateStatus(text) {
-    global statusText
-    statusText.Text := text
+WQFFF_UpdateStatus(wqfffUpdateStatusText, wqfffUpdateStatusValue) {
+    wqfffUpdateStatusText.Text := wqfffUpdateStatusValue
+}
+
+WQFFF_ReleaseKeys(&wqfffReleaseRunning, wqfffReleasePressTimer) {
+    SetTimer(wqfffReleasePressTimer, 0)
+    SendEvent "{w up}"
+    SendEvent "{q up}"
+    SendEvent "{f up}"
+    wqfffReleaseRunning := false
 }
