@@ -20,32 +20,39 @@ LoadScripts(){
     global scripts, scriptFolder
     scripts := []
     Loop Files scriptFolder "\*.ahk", "R"
-    {
         scripts.Push(A_LoopFileFullPath)
-    }
 }
 
 SwitchScript(step){
     global scripts,current
-    if scripts.Length=0
+    if scripts.Length = 0
         return
 
-    if current>0
-    {
-        SendEvent "{F7}"
-        Sleep 300
-        SendMessage 0xB001,0,0,"","ahk_exe AutoHotkey.exe"
-        Sleep 300
-    }
+    if current > 0
+        StopCurrent()
 
     current += step
-    if current<1
-        current:=scripts.Length
-    if current>scripts.Length
-        current:=1
+    if current < 1
+        current := scripts.Length
+    if current > scripts.Length
+        current := 1
 
     Run scripts[current]
     RefreshGL()
+}
+
+StopCurrent(){
+    global scripts,current
+    SplitPath scripts[current], &dir, &name
+    hwndFile := dir "\" name ".txt"
+    if FileExist(hwndFile){
+        hwnd := FileRead(hwndFile)
+        if hwnd
+            SendMessage 0xB001,0,0,,"ahk_id " hwnd
+        FileDelete hwndFile
+    }
+    SendEvent "{F7}"
+    Sleep 300
 }
 
 ShowGL(){
@@ -66,7 +73,7 @@ RefreshGL(){
     text := ""
     Loop scripts.Length
     {
-        SplitPath scripts[A_Index],,&,&name
+        SplitPath scripts[A_Index],,,&name
         if A_Index=current
             text .= "当前:" name " "
         else
