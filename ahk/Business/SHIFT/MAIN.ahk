@@ -10,13 +10,14 @@ text := myGui.AddText("w280 Center", "● 待机 | F6 开启")
 
 running := false
 
-glFile := A_ScriptDir "\\" A_ScriptName ".txt"
+glFile := A_ScriptDir "\" A_ScriptName ".txt"
 if FileExist(glFile)
     FileDelete(glFile)
 FileAppend(myGui.Hwnd, glFile)
 
 *F6::
 {
+    global running
     running := true
     Send("{Shift down}")
     text.Text := "● 运行中 | Shift 按住"
@@ -40,6 +41,7 @@ GL_Exit(*)
 
 ReleaseKeys(*)
 {
+    global running
     Send("{Shift up}")
     running := false
 }
