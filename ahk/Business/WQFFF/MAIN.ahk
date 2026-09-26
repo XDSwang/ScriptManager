@@ -17,7 +17,11 @@ WQFFF_Main() {
     wqfffMainFInterval := 100
     wqfffMainHwndFile := A_ScriptDir "\" A_ScriptName ".txt"
     wqfffMainPressTimer := (*) => WQFFF_PressFTimer(&wqfffMainRunning)
-    wqfffMainInputGuard := Input_CreateGuard()
+
+    ; 控制键可按需修改；启动/暂停/退出等控制热键都应加入此数组，否则输入保护可能把控制键本身当成用户干扰。
+    ; 提醒：控制键会被输入保护忽略，因此不要把同时承担游戏技能/业务输入的按键作为控制键。
+    wqfffMainControlKeys := ["F6", "F7"]
+    wqfffMainInputGuard := Input_CreateGuard(wqfffMainControlKeys)
 
     WQFFF_WriteHwnd(wqfffMainHwndFile, wqfffMainGui)
 
