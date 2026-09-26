@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 
-; GL_LogError - 记录异常/异常退出日志，每个脚本只保留最近一次记录。
+; GL_LogError - 覆盖式记录本脚本最近一次错误/异常退出信息；参数：reason=错误或退出原因，detail=附加说明，可省略。
 GL_LogError(glLogErrorReason, glLogErrorDetail := "") {
     glLogErrorFile := A_ScriptDir "\Error.log"
     glLogErrorTime := FormatTime(, "yyyy-MM-dd HH:mm:ss")
