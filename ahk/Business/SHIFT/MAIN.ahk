@@ -8,7 +8,8 @@
 #Include Task_Process.ahk
 
 SHIFT_Main() {
-    shiftMainGui := GLGui.Create("Shift 控制", 300, 35, 0, 0)
+    shiftMainGuiState := GLGui.Create("Shift 控制", 300, 35, 0, 0)
+    shiftMainGui := shiftMainGuiState.gui
     shiftMainStatusText := shiftMainGui.AddText("x10 y7 w280 h20 Center", "● 待机 | F6 开启")
     shiftMainHeld := false
     shiftMainHwndFile := A_ScriptDir "\" A_ScriptName ".txt"
