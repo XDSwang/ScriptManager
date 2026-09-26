@@ -8,13 +8,11 @@ SHIFT_Up() {
     SendEvent "{LShift up}"
 }
 
-SHIFT_UpdateStatus(text) {
-    global statusText
-    statusText.Text := text
+SHIFT_UpdateStatus(shiftUpdateStatusText, shiftUpdateStatusValue) {
+    shiftUpdateStatusText.Text := shiftUpdateStatusValue
 }
 
-SHIFT_ReleaseKeys(*) {
-    global shiftHeld
+SHIFT_ReleaseKeys(&shiftReleaseHeld) {
     SendEvent "{LShift up}"
-    shiftHeld := false
+    shiftReleaseHeld := false
 }
