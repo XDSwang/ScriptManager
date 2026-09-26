@@ -37,6 +37,7 @@ SHIFT_WriteHwnd(shiftWriteHwndFile, shiftWriteHwndGui) {
 SHIFT_Exit(shiftExitHwndFile, &shiftExitHeld, shiftExitInputGuard) {
     Input_StopGuard(shiftExitInputGuard)
     SHIFT_ReleaseKeys(&shiftExitHeld, shiftExitInputGuard)
+    Input_WaitPhysicalRelease()
 
     if FileExist(shiftExitHwndFile)
         FileDelete shiftExitHwndFile
