@@ -1,16 +1,16 @@
 #Requires AutoHotkey v2.0
 
 class GLGui {
-    ; GLGui.Create - 创建统一的置顶、黑底、透明 GUI；参数：title=窗口标题，width=窗口宽度，height=窗口高度，x=可选横坐标，y=可选纵坐标。
+    ; GLGui.Create - 创建统一的置顶、黑底、透明且不激活前台的 GUI；参数：title=窗口标题，width=窗口宽度，height=窗口高度，x=可选横坐标，y=可选纵坐标。
     static Create(glGuiCreateTitle := "", glGuiCreateWidth := 300, glGuiCreateHeight := 35, glGuiCreateX := unset, glGuiCreateY := unset) {
         glGuiCreateGuiObj := Gui("+AlwaysOnTop", glGuiCreateTitle)
         glGuiCreateGuiObj.BackColor := "000000"
         glGuiCreateGuiObj.SetFont("s9 cFFFFFF", "Microsoft YaHei")
 
         if IsSet(glGuiCreateX) && IsSet(glGuiCreateY)
-            glGuiCreateGuiObj.Show("x" glGuiCreateX " y" glGuiCreateY " w" glGuiCreateWidth " h" glGuiCreateHeight)
+            glGuiCreateGuiObj.Show("x" glGuiCreateX " y" glGuiCreateY " w" glGuiCreateWidth " h" glGuiCreateHeight " NA")
         else
-            glGuiCreateGuiObj.Show("w" glGuiCreateWidth " h" glGuiCreateHeight)
+            glGuiCreateGuiObj.Show("w" glGuiCreateWidth " h" glGuiCreateHeight " NA")
 
         WinSetTransparent(220, glGuiCreateGuiObj)
         return {gui: glGuiCreateGuiObj, controls: []}
