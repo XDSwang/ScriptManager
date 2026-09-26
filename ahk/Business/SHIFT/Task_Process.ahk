@@ -10,7 +10,7 @@ SHIFT_Start(&shiftStartHeld, shiftStartStatusText, shiftStartInputGuard) {
     if shiftStartHeld
         return
 
-    Common_InputControl_StartGuard(
+    Input_InputControl_StartGuard(
         shiftStartInputGuard,
         (*) => SHIFT_PauseForInput(&shiftStartHeld, shiftStartStatusText),
         (*) => SHIFT_Start(&shiftStartHeld, shiftStartStatusText, shiftStartInputGuard)
@@ -23,7 +23,7 @@ SHIFT_Start(&shiftStartHeld, shiftStartStatusText, shiftStartInputGuard) {
 
 ; ★ SHIFT_Stop：F7、GL 切换、GL F8 都使用同一套停止流程。
 SHIFT_Stop(&shiftStopHeld, shiftStopStatusText, shiftStopInputGuard) {
-    Common_InputControl_StopGuard(shiftStopInputGuard)
+    Input_InputControl_StopGuard(shiftStopInputGuard)
     SHIFT_ReleaseKeys(&shiftStopHeld, shiftStopInputGuard)
     SHIFT_UpdateStatus(shiftStopStatusText, "● 待机 | F6 开启")
 }

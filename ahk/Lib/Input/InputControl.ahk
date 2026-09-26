@@ -1,14 +1,14 @@
 #Requires AutoHotkey v2.0
 
 ; ★ 输入保护运行流程：
-; ★ F6 → Common_InputControl_StartGuard
+; ★ F6 → Input_InputControl_StartGuard
 ; ★ → 记录启动基线 → 每 20ms 检查 → 发现新物理按键 → 业务暂停
 ; ★ → 等干扰按键全部释放 → 调用恢复回调 → 业务重新启动。
 ; ★ 控制键（例如 F6/F7）必须在 ignoredKeys 中。
 
-; Common_InputControl_CreateGuard - 创建输入保护状态并登记控制键；参数：controlKeys=本脚本控制键数组。
-Common_InputControl_CreateGuard(commonInputControlCreateGuardControlKeys := []) {
-    commonInputControlCreateGuardState := {
+; Input_InputControl_CreateGuard - 创建输入保护状态并登记控制键；参数：controlKeys=本脚本控制键数组。
+Input_InputControl_CreateGuard(inputInputControlCreateGuardControlKeys := []) {
+    inputInputControlCreateGuardState := {
         monitoring: false,
         paused: false,
         baseline: Map(),
@@ -17,152 +17,152 @@ Common_InputControl_CreateGuard(commonInputControlCreateGuardControlKeys := []) 
         timer: 0
     }
 
-    for commonInputControlCreateGuardControlKey in commonInputControlCreateGuardControlKeys {
-        commonInputControlCreateGuardControlKeyVk := GetKeyVK(commonInputControlCreateGuardControlKey)
-        if commonInputControlCreateGuardControlKeyVk
-            commonInputControlCreateGuardState.ignoredKeys["vk" Format("{:02X}", commonInputControlCreateGuardControlKeyVk)] := true
+    for inputInputControlCreateGuardControlKey in inputInputControlCreateGuardControlKeys {
+        inputInputControlCreateGuardControlKeyVk := GetKeyVK(inputInputControlCreateGuardControlKey)
+        if inputInputControlCreateGuardControlKeyVk
+            inputInputControlCreateGuardState.ignoredKeys["vk" Format("{:02X}", inputInputControlCreateGuardControlKeyVk)] := true
     }
 
-    return commonInputControlCreateGuardState
+    return inputInputControlCreateGuardState
 }
 
-; Common_InputControl_StartGuard - 启动输入保护并建立物理按键基线；参数：state=状态对象，interferenceCallback=干扰回调，resumeCallback=恢复回调。
-Common_InputControl_StartGuard(commonInputControlStartGuardState, commonInputControlStartGuardInterferenceCallback, commonInputControlStartGuardResumeCallback) {
-    Common_InputControl_StopGuard(commonInputControlStartGuardState)
+; Input_InputControl_StartGuard - 启动输入保护并建立物理按键基线；参数：state=状态对象，interferenceCallback=干扰回调，resumeCallback=恢复回调。
+Input_InputControl_StartGuard(inputInputControlStartGuardState, inputInputControlStartGuardInterferenceCallback, inputInputControlStartGuardResumeCallback) {
+    Input_InputControl_StopGuard(inputInputControlStartGuardState)
 
-    commonInputControlStartGuardState.baseline := Common_InputControl_CapturePhysicalKeys()
-    commonInputControlStartGuardState.monitoring := true
-    commonInputControlStartGuardState.paused := false
-    commonInputControlStartGuardState.timer := (*) => Common_InputControl_CheckGuard(commonInputControlStartGuardState, commonInputControlStartGuardInterferenceCallback, commonInputControlStartGuardResumeCallback)
-    SetTimer(commonInputControlStartGuardState.timer, 20)
+    inputInputControlStartGuardState.baseline := Input_InputControl_CapturePhysicalKeys()
+    inputInputControlStartGuardState.monitoring := true
+    inputInputControlStartGuardState.paused := false
+    inputInputControlStartGuardState.timer := (*) => Input_InputControl_CheckGuard(inputInputControlStartGuardState, inputInputControlStartGuardInterferenceCallback, inputInputControlStartGuardResumeCallback)
+    SetTimer(inputInputControlStartGuardState.timer, 20)
     return true
 }
 
-; Common_InputControl_StopGuard - 停止输入保护并清空本次运行状态；参数：state=状态对象。
-Common_InputControl_StopGuard(commonInputControlStopGuardState) {
-    commonInputControlStopGuardState.monitoring := false
-    commonInputControlStopGuardState.paused := false
+; Input_InputControl_StopGuard - 停止输入保护并清空本次运行状态；参数：state=状态对象。
+Input_InputControl_StopGuard(inputInputControlStopGuardState) {
+    inputInputControlStopGuardState.monitoring := false
+    inputInputControlStopGuardState.paused := false
 
-    if commonInputControlStopGuardState.timer
-        SetTimer(commonInputControlStopGuardState.timer, 0)
+    if inputInputControlStopGuardState.timer
+        SetTimer(inputInputControlStopGuardState.timer, 0)
 
-    commonInputControlStopGuardState.timer := 0
-    commonInputControlStopGuardState.baseline := Map()
-    commonInputControlStopGuardState.interferenceKeys := Map()
+    inputInputControlStopGuardState.timer := 0
+    inputInputControlStopGuardState.baseline := Map()
+    inputInputControlStopGuardState.interferenceKeys := Map()
     return true
 }
 
-; Common_InputControl_CheckGuard - 执行一次输入保护检测；参数：state=状态对象，interferenceCallback=干扰回调，resumeCallback=恢复回调。
-Common_InputControl_CheckGuard(commonInputControlCheckGuardState, commonInputControlCheckGuardInterferenceCallback, commonInputControlCheckGuardResumeCallback) {
-    if !commonInputControlCheckGuardState.monitoring
+; Input_InputControl_CheckGuard - 执行一次输入保护检测；参数：state=状态对象，interferenceCallback=干扰回调，resumeCallback=恢复回调。
+Input_InputControl_CheckGuard(inputInputControlCheckGuardState, inputInputControlCheckGuardInterferenceCallback, inputInputControlCheckGuardResumeCallback) {
+    if !inputInputControlCheckGuardState.monitoring
         return false
 
-    commonInputControlCheckGuardCurrent := Common_InputControl_CapturePhysicalKeys()
+    inputInputControlCheckGuardCurrent := Input_InputControl_CapturePhysicalKeys()
 
-    if !commonInputControlCheckGuardState.paused {
-        commonInputControlCheckGuardNewKeys := Common_InputControl_FindNewPhysicalKeys(commonInputControlCheckGuardState.baseline, commonInputControlCheckGuardCurrent, commonInputControlCheckGuardState.ignoredKeys)
+    if !inputInputControlCheckGuardState.paused {
+        inputInputControlCheckGuardNewKeys := Input_InputControl_FindNewPhysicalKeys(inputInputControlCheckGuardState.baseline, inputInputControlCheckGuardCurrent, inputInputControlCheckGuardState.ignoredKeys)
 
-        if commonInputControlCheckGuardNewKeys.Count {
-            for commonInputControlCheckGuardKey in commonInputControlCheckGuardNewKeys
-                commonInputControlCheckGuardState.interferenceKeys[commonInputControlCheckGuardKey] := true
+        if inputInputControlCheckGuardNewKeys.Count {
+            for inputInputControlCheckGuardKey in inputInputControlCheckGuardNewKeys
+                inputInputControlCheckGuardState.interferenceKeys[inputInputControlCheckGuardKey] := true
 
-            commonInputControlCheckGuardState.paused := true
-            commonInputControlCheckGuardInterferenceCallback.Call()
+            inputInputControlCheckGuardState.paused := true
+            inputInputControlCheckGuardInterferenceCallback.Call()
             return true
         }
 
         return false
     }
 
-    Common_InputControl_RemoveReleasedInterferenceKeys(commonInputControlCheckGuardState.interferenceKeys, commonInputControlCheckGuardCurrent)
+    Input_InputControl_RemoveReleasedInterferenceKeys(inputInputControlCheckGuardState.interferenceKeys, inputInputControlCheckGuardCurrent)
 
-    if !commonInputControlCheckGuardState.interferenceKeys.Count {
-        commonInputControlCheckGuardState.paused := false
-        commonInputControlCheckGuardResumeCallback.Call()
+    if !inputInputControlCheckGuardState.interferenceKeys.Count {
+        inputInputControlCheckGuardState.paused := false
+        inputInputControlCheckGuardResumeCallback.Call()
         return true
     }
 
     return false
 }
 
-; Common_InputControl_CapturePhysicalKeys - 获取当前所有物理按下的虚拟键；参数：无。
-Common_InputControl_CapturePhysicalKeys() {
-    commonInputControlCapturePhysicalKeysMap := Map()
+; Input_InputControl_CapturePhysicalKeys - 获取当前所有物理按下的虚拟键；参数：无。
+Input_InputControl_CapturePhysicalKeys() {
+    inputInputControlCapturePhysicalKeysMap := Map()
 
     Loop 254 {
-        commonInputControlCapturePhysicalKeysVirtualKey := A_Index
-        commonInputControlCapturePhysicalKeysName := "vk" Format("{:02X}", commonInputControlCapturePhysicalKeysVirtualKey)
+        inputInputControlCapturePhysicalKeysVirtualKey := A_Index
+        inputInputControlCapturePhysicalKeysName := "vk" Format("{:02X}", inputInputControlCapturePhysicalKeysVirtualKey)
 
-        if GetKeyState(commonInputControlCapturePhysicalKeysName, "P")
-            commonInputControlCapturePhysicalKeysMap[commonInputControlCapturePhysicalKeysName] := true
+        if GetKeyState(inputInputControlCapturePhysicalKeysName, "P")
+            inputInputControlCapturePhysicalKeysMap[inputInputControlCapturePhysicalKeysName] := true
     }
 
-    return commonInputControlCapturePhysicalKeysMap
+    return inputInputControlCapturePhysicalKeysMap
 }
 
-; Common_InputControl_FindNewPhysicalKeys - 找出启动基线之后新增的物理按键；参数：baseline=启动基线，currentKeys=当前物理按键，ignoredKeys=忽略的控制键。
-Common_InputControl_FindNewPhysicalKeys(commonInputControlFindNewPhysicalKeysBaseline, commonInputControlFindNewPhysicalKeysCurrentKeys, commonInputControlFindNewPhysicalKeysIgnoredKeys) {
-    commonInputControlFindNewPhysicalKeysResult := Map()
+; Input_InputControl_FindNewPhysicalKeys - 找出启动基线之后新增的物理按键；参数：baseline=启动基线，currentKeys=当前物理按键，ignoredKeys=忽略的控制键。
+Input_InputControl_FindNewPhysicalKeys(inputInputControlFindNewPhysicalKeysBaseline, inputInputControlFindNewPhysicalKeysCurrentKeys, inputInputControlFindNewPhysicalKeysIgnoredKeys) {
+    inputInputControlFindNewPhysicalKeysResult := Map()
 
-    if Common_InputControl_IsImeOpen()
-        return commonInputControlFindNewPhysicalKeysResult
+    if Input_InputControl_IsImeOpen()
+        return inputInputControlFindNewPhysicalKeysResult
 
-    for commonInputControlFindNewPhysicalKeysKey in commonInputControlFindNewPhysicalKeysCurrentKeys {
-        if commonInputControlFindNewPhysicalKeysIgnoredKeys.Has(commonInputControlFindNewPhysicalKeysKey)
+    for inputInputControlFindNewPhysicalKeysKey in inputInputControlFindNewPhysicalKeysCurrentKeys {
+        if inputInputControlFindNewPhysicalKeysIgnoredKeys.Has(inputInputControlFindNewPhysicalKeysKey)
             continue
 
-        if !commonInputControlFindNewPhysicalKeysBaseline.Has(commonInputControlFindNewPhysicalKeysKey)
-            commonInputControlFindNewPhysicalKeysResult[commonInputControlFindNewPhysicalKeysKey] := true
+        if !inputInputControlFindNewPhysicalKeysBaseline.Has(inputInputControlFindNewPhysicalKeysKey)
+            inputInputControlFindNewPhysicalKeysResult[inputInputControlFindNewPhysicalKeysKey] := true
     }
 
-    return commonInputControlFindNewPhysicalKeysResult
+    return inputInputControlFindNewPhysicalKeysResult
 }
 
-; Common_InputControl_RemoveReleasedInterferenceKeys - 删除已经物理释放的干扰键；参数：interferenceKeys=干扰键记录，currentKeys=当前物理按键。
-Common_InputControl_RemoveReleasedInterferenceKeys(commonInputControlRemoveReleasedInterferenceKeysMap, commonInputControlRemoveReleasedInterferenceKeysCurrentKeys) {
-    commonInputControlRemoveReleasedInterferenceKeysReleased := Map()
+; Input_InputControl_RemoveReleasedInterferenceKeys - 删除已经物理释放的干扰键；参数：interferenceKeys=干扰键记录，currentKeys=当前物理按键。
+Input_InputControl_RemoveReleasedInterferenceKeys(inputInputControlRemoveReleasedInterferenceKeysMap, inputInputControlRemoveReleasedInterferenceKeysCurrentKeys) {
+    inputInputControlRemoveReleasedInterferenceKeysReleased := Map()
 
-    for commonInputControlRemoveReleasedInterferenceKeysKey in commonInputControlRemoveReleasedInterferenceKeysMap {
-        if !commonInputControlRemoveReleasedInterferenceKeysCurrentKeys.Has(commonInputControlRemoveReleasedInterferenceKeysKey) {
-            commonInputControlRemoveReleasedInterferenceKeysReleased[commonInputControlRemoveReleasedInterferenceKeysKey] := true
-            commonInputControlRemoveReleasedInterferenceKeysMap.Delete(commonInputControlRemoveReleasedInterferenceKeysKey)
+    for inputInputControlRemoveReleasedInterferenceKeysKey in inputInputControlRemoveReleasedInterferenceKeysMap {
+        if !inputInputControlRemoveReleasedInterferenceKeysCurrentKeys.Has(inputInputControlRemoveReleasedInterferenceKeysKey) {
+            inputInputControlRemoveReleasedInterferenceKeysReleased[inputInputControlRemoveReleasedInterferenceKeysKey] := true
+            inputInputControlRemoveReleasedInterferenceKeysMap.Delete(inputInputControlRemoveReleasedInterferenceKeysKey)
         }
     }
 
-    return commonInputControlRemoveReleasedInterferenceKeysReleased
+    return inputInputControlRemoveReleasedInterferenceKeysReleased
 }
 
-; Common_InputControl_IsImeOpen - 判断当前活动窗口是否开启输入法；参数：无。
-Common_InputControl_IsImeOpen() {
-    commonInputControlIsImeOpenHwnd := WinExist("A")
-    if !commonInputControlIsImeOpenHwnd
+; Input_InputControl_IsImeOpen - 判断当前活动窗口是否开启输入法；参数：无。
+Input_InputControl_IsImeOpen() {
+    inputInputControlIsImeOpenHwnd := WinExist("A")
+    if !inputInputControlIsImeOpenHwnd
         return false
 
-    commonInputControlIsImeOpenContext := DllCall("imm32\ImmGetContext", "Ptr", commonInputControlIsImeOpenHwnd, "Ptr")
-    if !commonInputControlIsImeOpenContext
+    inputInputControlIsImeOpenContext := DllCall("imm32ImmGetContext", "Ptr", inputInputControlIsImeOpenHwnd, "Ptr")
+    if !inputInputControlIsImeOpenContext
         return false
 
-    commonInputControlIsImeOpenStatus := DllCall("imm32\ImmGetOpenStatus", "Ptr", commonInputControlIsImeOpenContext)
-    DllCall("imm32\ImmReleaseContext", "Ptr", commonInputControlIsImeOpenHwnd, "Ptr", commonInputControlIsImeOpenContext)
-    return commonInputControlIsImeOpenStatus != 0
+    inputInputControlIsImeOpenStatus := DllCall("imm32ImmGetOpenStatus", "Ptr", inputInputControlIsImeOpenContext)
+    DllCall("imm32ImmReleaseContext", "Ptr", inputInputControlIsImeOpenHwnd, "Ptr", inputInputControlIsImeOpenContext)
+    return inputInputControlIsImeOpenStatus != 0
 }
 
-; Common_InputControl_KeyDown - 使用 SendEvent 按下指定按键；参数：key=AHK 按键名称。
-Common_InputControl_KeyDown(commonInputControlKeyDownKey) {
-    SendEvent "{" commonInputControlKeyDownKey " down}"
+; Input_InputControl_KeyDown - 使用 SendEvent 按下指定按键；参数：key=AHK 按键名称。
+Input_InputControl_KeyDown(inputInputControlKeyDownKey) {
+    SendEvent "{" inputInputControlKeyDownKey " down}"
     return true
 }
 
-; Common_InputControl_KeyUp - 使用 SendEvent 释放指定按键；参数：key=AHK 按键名称。
-Common_InputControl_KeyUp(commonInputControlKeyUpKey) {
-    SendEvent "{" commonInputControlKeyUpKey " up}"
+; Input_InputControl_KeyUp - 使用 SendEvent 释放指定按键；参数：key=AHK 按键名称。
+Input_InputControl_KeyUp(inputInputControlKeyUpKey) {
+    SendEvent "{" inputInputControlKeyUpKey " up}"
     return true
 }
 
-; Common_InputControl_ReleaseKeys - 按顺序释放传入数组中的所有按键；参数：keys=需要释放的 AHK 按键名称数组。
-Common_InputControl_ReleaseKeys(commonInputControlReleaseKeysList) {
-    for commonInputControlReleaseKeysKey in commonInputControlReleaseKeysList
-        Common_InputControl_KeyUp(commonInputControlReleaseKeysKey)
+; Input_InputControl_ReleaseKeys - 按顺序释放传入数组中的所有按键；参数：keys=需要释放的 AHK 按键名称数组。
+Input_InputControl_ReleaseKeys(inputInputControlReleaseKeysList) {
+    for inputInputControlReleaseKeysKey in inputInputControlReleaseKeysList
+        Input_InputControl_KeyUp(inputInputControlReleaseKeysKey)
 
     return true
 }
