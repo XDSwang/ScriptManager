@@ -4,6 +4,7 @@
 
 #Include ../../Lib/Common/GUI.ahk
 #Include ../../Lib/Common/Message.ahk
+#Include ../../Lib/Input/InputControl.ahk
 #Include Task_Action.ahk
 #Include Task_Process.ahk
 
@@ -15,13 +16,14 @@ WQFFF_Main() {
     wqfffMainFInterval := 100
     wqfffMainHwndFile := A_ScriptDir "\" A_ScriptName ".txt"
     wqfffMainPressTimer := (*) => WQFFF_PressFTimer(&wqfffMainRunning)
+    wqfffMainInputGuard := Input_CreateGuard()
 
     WQFFF_WriteHwnd(wqfffMainHwndFile, wqfffMainGui)
 
-    Hotkey("*F6", (*) => WQFFF_Start(&wqfffMainRunning, wqfffMainFInterval, wqfffMainPressTimer, wqfffMainStatusText))
-    Hotkey("*F7", (*) => WQFFF_Stop(&wqfffMainRunning, wqfffMainPressTimer, wqfffMainStatusText))
-    OnMessage(0xB001, (*) => WQFFF_Exit(wqfffMainHwndFile, &wqfffMainRunning, wqfffMainPressTimer))
-    OnExit((*) => WQFFF_ReleaseKeys(&wqfffMainRunning, wqfffMainPressTimer))
+    Hotkey("*F6", (*) => WQFFF_Start(&wqfffMainRunning, wqfffMainFInterval, wqfffMainPressTimer, wqfffMainStatusText, wqfffMainInputGuard))
+    Hotkey("*F7", (*) => WQFFF_Stop(&wqfffMainRunning, wqfffMainPressTimer, wqfffMainStatusText, wqfffMainInputGuard))
+    OnMessage(0xB001, (*) => WQFFF_Exit(wqfffMainHwndFile, &wqfffMainRunning, wqfffMainPressTimer, wqfffMainInputGuard))
+    OnExit((*) => WQFFF_ReleaseKeys(&wqfffMainRunning, wqfffMainPressTimer, wqfffMainInputGuard))
 }
 
 WQFFF_Main()
