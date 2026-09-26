@@ -6,12 +6,12 @@ class GLGui {
 
     ; Create - 创建统一的置顶、黑底、透明GUI；参数：title=标题，width=宽度，height=高度。
     static Create(title := "", width := 300, height := 35) {
-        gui := Gui("+AlwaysOnTop", title)
-        gui.BackColor := "000000"
-        gui.SetFont("s9 cFFFFFF", "Microsoft YaHei")
-        gui.Show("w" width " h" height)
-        WinSetTransparent(220, gui)
-        return gui
+        guiObj := Gui("+AlwaysOnTop", title)
+        guiObj.BackColor := "000000"
+        guiObj.SetFont("s9 cFFFFFF", "Microsoft YaHei")
+        guiObj.Show("w" width " h" height)
+        WinSetTransparent(220, guiObj)
+        return guiObj
     }
 
     ; UpdateList - 更新脚本名称列表和当前项颜色；参数：gui=GUI对象，scripts=脚本路径数组，currentIndex=当前索引。
