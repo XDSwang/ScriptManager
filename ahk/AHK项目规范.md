@@ -73,7 +73,7 @@ ahk/Lib/公共库函数使用文档.md
 例如：
 
 ```ahk
-GL_LoadScripts(glLoadScriptsFolder) {
+GL_Process_LoadScripts(glLoadScriptsFolder) {
     glLoadScriptsList := []
 }
 ```
