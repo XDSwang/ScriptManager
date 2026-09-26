@@ -11,7 +11,7 @@ GL_SwitchScript(glSwitchStep, glSwitchScripts, &glSwitchCurrentIndex, glSwitchMa
         return
 
     if glSwitchCurrentIndex > 0
-        GL_StopCurrent(glSwitchScripts, glSwitchCurrentIndex, GLMessage.ExitReasonSwitch)
+        GL_StopCurrent(glSwitchScripts, glSwitchCurrentIndex, Common_Message_Exit.ExitReasonSwitch)
 
     glSwitchCurrentIndex += glSwitchStep
     if glSwitchCurrentIndex < 1
@@ -75,7 +75,7 @@ GL_RequestExitCurrent(glRequestExitScripts, glRequestExitCurrentIndex, glRequest
 
     glRequestExitHwnd := GL_ReadHwndFile(glRequestExitHwndFile)
     if glRequestExitHwnd
-        SendExitMessage(glRequestExitHwnd, glRequestExitReason)
+        Common_Message_SendExit(glRequestExitHwnd, glRequestExitReason)
 }
 
 ; ★ GL_ReadHwndFile：处理子脚本刚启动时“文件存在但还没写完”的短暂状态。
@@ -101,13 +101,13 @@ GL_ReadHwndFile(glReadHwndFile) {
 ; ★ F8 管理器退出完整链：
 ; ★ F8 → GL_ExitManager → 停止当前子脚本 → 等待 .txt 删除 → 记录日志 → ExitApp。
 GL_ExitManager(glExitManagerScripts, glExitManagerCurrentIndex) {
-    GL_StopCurrent(glExitManagerScripts, glExitManagerCurrentIndex, GLMessage.ExitReasonManager)
-    GL_LogError("GL F8 退出", "管理器主动结束；已等待当前子脚本退出")
+    GL_StopCurrent(glExitManagerScripts, glExitManagerCurrentIndex, Common_Message_Exit.ExitReasonManager)
+    Common_Log_Error("GL F8 退出", "管理器主动结束；已等待当前子脚本退出")
     ExitApp
 }
 
 GL_Show() {
-    return GLGui.Create("GL管理器", 300, 35)
+    return Common_GUI_Create("GL管理器", 300, 35)
 }
 
 ; ★ 每次启动/切换后刷新管理器 GUI；当前索引由 GUI 公共库显示为红色。
@@ -115,5 +115,5 @@ GL_Refresh(glRefreshManagerGuiState, glRefreshScripts, glRefreshCurrentIndex) {
     if !glRefreshManagerGuiState
         return
 
-    GLGui.UpdateList(glRefreshManagerGuiState, glRefreshScripts, glRefreshCurrentIndex)
+    Common_GUI_UpdateList(glRefreshManagerGuiState, glRefreshScripts, glRefreshCurrentIndex)
 }
