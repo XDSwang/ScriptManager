@@ -4,6 +4,7 @@
 class GLGui {
     static _controls := Map()
 
+    ; Create - 创建统一的置顶、黑底、透明GUI；参数：title=标题，width=宽度，height=高度。
     static Create(title := "", width := 300, height := 35) {
         gui := Gui("+AlwaysOnTop", title)
         gui.BackColor := "000000"
@@ -13,6 +14,7 @@ class GLGui {
         return gui
     }
 
+    ; UpdateList - 更新脚本名称列表和当前项颜色；参数：gui=GUI对象，scripts=脚本路径数组，currentIndex=当前索引。
     static UpdateList(gui, scripts, currentIndex) {
         if !gui
             return 0
