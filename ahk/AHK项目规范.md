@@ -147,12 +147,18 @@ Action / 公共库
 具体脚本名称_具体功能
 
 例如：
-- Business/SHIFT/Task_Process.ahk → SHIFT_Start()
-- Business/SHIFT/Task_Action.ahk → SHIFT_Down()
-- Business/WQFFF/Task_Process.ahk → WQFFF_Start()
-- GL/GL_Process.ahk → GL_LoadScripts()
+- Business/SHIFT/MAIN.ahk → MAIN()
+- Business/SHIFT/Task_Process.ahk → Task_Process_Start()
+- Business/SHIFT/Task_Action.ahk → Task_Action_Down()
+- Business/WQFFF/Task_Process.ahk → Task_Process_Start()
+- Business/WQFFF/Task_Action.ahk → Task_Action_Down()
+- GL/GL_Config.ahk → GL_Config_GetManagedFolder()
+- GL/GL_Process.ahk → GL_Process_LoadScripts()
+- GL/GL_Action.ahk → GL_Action_SwitchScript()
 
-重点是：**同级目录内部调用，不需要人为加入更高层级的公共库分类前缀。**
+这里的“脚本名称”就是当前目录下实际 `.ahk` 文件的脚本名（不含扩展名）。例如 `Task_Process.ahk` 的函数使用 `Task_Process_*`，不能因为它位于 `SHIFT` 目录就改成 `SHIFT_*`。
+
+重点是：**同级目录内部调用，不需要把上级业务目录名再次塞进函数名；同级目录本身已经提供了第一层命名空间。**
 
 #### ★ 3.5.2 跨目录引用：提升为公共可引用模块命名
 当某个脚本中的函数需要被**其他目录、其他业务模块或其他独立脚本引用**时，该脚本已经具有“公共可引用模块”的性质。
@@ -285,21 +291,33 @@ Lib/File/FileControl.ahk
 
 `Business/SHIFT/Task_Process.ahk`
 
-在业务目录内部使用时，保持：
+在 `SHIFT` 目录内部使用时，应保持：
 
-`SHIFT_Start()`
+`Task_Process_Start()`
 
-如果未来某个模块需要跨目录公开引用，并且项目定义了明确的上级业务分类，例如：
+如果以后这个脚本中的能力真的需要被其他目录公开引用，则应把可复用能力抽到公共库，或者在项目明确存在真实公共分类时，按：
 
-`Business/Automation/SHIFT/Task_Process.ahk`
+`分类_具体脚本名称_具体功能`
 
-则跨目录公开函数应按真实归属提升为：
+进行提升。
 
-`Automation_SHIFT_Start()`
+例如某个真实公共模块位于：
 
-如果再存在更高一级、且确实属于模块语义的分类，则继续向前增加：
+`Lib/Automation/Task_Process.ahk`
 
-`System_Automation_SHIFT_Start()`
+则跨目录公开函数可定义为：
+
+`Automation_Task_Process_Start()`
+
+如果再存在真实且有模块语义的上级分类：
+
+`Lib/System/Automation/Task_Process.ahk`
+
+则：
+
+`System_Automation_Task_Process_Start()`
+
+注意：**不能因为原来脚本位于 `Business/SHIFT`，就把 `SHIFT` 人为加入所有同级函数名；也不能把调用方目录名称当成公共分类。**
 
 核心要求只有一个：
 
@@ -327,7 +345,7 @@ Lib/File/FileControl.ahk
 
 ```text
 业务函数：
-WQFFF_Start()
+Task_Process_Start()
 
 公共库函数：
 Input_InputControl_StartGuard()
@@ -712,9 +730,16 @@ Lib/Action/Window.ahk
 Lib/File/FileControl.ahk
 ```
 
-**文件名决定模块归属，函数名必须再次明确真实具体脚本名称。**
+**同级目录内，文件名就是函数的第一层脚本归属。**
 
-不能因为文件名已经明确，就在函数名中省略所属脚本名称。
+例如：
+
+`Task_Process.ahk` → `Task_Process_*`
+`Task_Action.ahk` → `Task_Action_*`
+
+`MAIN.ahk` 作为单独入口脚本，可以使用 `MAIN()` 作为入口函数。
+
+不能因为业务目录名已经明确，就把业务目录名重复加入同级函数，例如不要把 `SHIFT/Task_Process.ahk` 写成 `SHIFT_Start()`。
 
 ## 14. 日志规范
 
@@ -756,8 +781,9 @@ Common_Log_Error()
 新增或修改功能时：
 
 1. **先确定真实具体脚本名称。**
-2. **如果属于公共库，必须按照真实能力分类套用 `分类_具体脚本名称_具体功能`；例如 `Common_`、`Action_`、`Input_`、`File_`。**
-3. 如果属于业务脚本，使用 `具体脚本名称_具体功能`。
+2. **如果属于同级目录内部使用，直接使用 `具体脚本名称_具体功能`；例如 `Task_Process_Start()`、`Task_Action_Down()`。`MAIN.ahk` 的入口函数可使用 `MAIN()`。**
+3. **如果属于公共库或真正需要跨目录公开复用，必须按照真实能力分类套用 `分类_具体脚本名称_具体功能`；例如 `Common_`、`Action_`、`Input_`、`File_`。**
+4. 不允许因为业务目录名而人为增加 `SHIFT_`、`WQFFF_` 等前缀；业务目录是目录级命名空间，不是同级脚本函数名前缀。
 4. 先判断公共库是否已有能力。
 5. 有则直接调用。
 6. 没有且属于当前脚本专用动作，则写入当前脚本 Action。
