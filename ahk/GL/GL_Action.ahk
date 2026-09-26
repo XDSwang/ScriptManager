@@ -26,17 +26,25 @@ GL_StopCurrent() {
     SplitPath scripts[current], &fileName, &dir
     hwndFile := dir "\" fileName ".txt"
 
+    ; 先暂停当前脚本
     SendEvent "{F7}"
     Sleep 100
 
+    ; 再按当前脚本自己的 hwnd 精确退出
     if FileExist(hwndFile) {
         hwnd := Trim(FileRead(hwndFile))
         if hwnd
             SendExitMessage(hwnd)
-        FileDelete hwndFile
-    }
 
-    Sleep 300
+        Loop 20 {
+            Sleep 100
+            if !FileExist(hwndFile)
+                break
+        }
+
+        if FileExist(hwndFile)
+            FileDelete hwndFile
+    }
 }
 
 GL_Show() {
