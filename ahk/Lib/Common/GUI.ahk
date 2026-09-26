@@ -4,12 +4,17 @@
 class GLGui {
     static _controls := Map()
 
-    ; Create - 创建统一的置顶、黑底、透明GUI；参数：title=标题，width=宽度，height=高度。
-    static Create(title := "", width := 300, height := 35) {
+    ; Create - 创建统一的置顶、黑底、透明GUI；参数：title=标题，width=宽度，height=高度，x/y=可选位置。
+    static Create(title := "", width := 300, height := 35, x := unset, y := unset) {
         guiObj := Gui("+AlwaysOnTop", title)
         guiObj.BackColor := "000000"
         guiObj.SetFont("s9 cFFFFFF", "Microsoft YaHei")
-        guiObj.Show("w" width " h" height)
+
+        if IsSet(x) && IsSet(y)
+            guiObj.Show("x" x " y" y " w" width " h" height)
+        else
+            guiObj.Show("w" width " h" height)
+
         WinSetTransparent(220, guiObj)
         return guiObj
     }
