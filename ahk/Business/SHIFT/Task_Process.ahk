@@ -34,8 +34,11 @@ SHIFT_WriteHwnd(shiftWriteHwndFile, shiftWriteHwndGui) {
     FileAppend(shiftWriteHwndGui.Hwnd, shiftWriteHwndFile)
 }
 
-SHIFT_Exit(shiftExitHwndFile, &shiftExitHeld, shiftExitInputGuard, shiftExitStatusText) {
+SHIFT_Exit(shiftExitReason, shiftExitHwndFile, &shiftExitHeld, shiftExitInputGuard, shiftExitStatusText) {
     SHIFT_Stop(&shiftExitHeld, shiftExitStatusText, shiftExitInputGuard)
+
+    if shiftExitReason = GLMessage.ExitReasonManager
+        GL_LogError("GL F8 子脚本退出", "SHIFT 收到管理器退出通知")
 
     if FileExist(shiftExitHwndFile)
         FileDelete shiftExitHwndFile
