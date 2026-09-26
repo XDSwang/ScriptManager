@@ -3,8 +3,12 @@
 GL_LoadScripts(glLoadScriptsFolder) {
     glLoadScriptsList := []
 
-    Loop Files glLoadScriptsFolder "\*\MAIN.ahk"
-        glLoadScriptsList.Push(A_LoopFileFullPath)
+    Loop Files glLoadScriptsFolder "\*", "D" {
+        glLoadScriptsMainFile := A_LoopFileFullPath "\MAIN.ahk"
+
+        if FileExist(glLoadScriptsMainFile)
+            glLoadScriptsList.Push(glLoadScriptsMainFile)
+    }
 
     return GL_SortScripts(glLoadScriptsList)
 }
