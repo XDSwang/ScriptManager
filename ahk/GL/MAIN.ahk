@@ -11,6 +11,7 @@ current := 0
 glGui := 0
 
 LoadScripts()
+SortScripts()
 ShowGL()
 
 ^Up::SwitchScript(1)
@@ -23,20 +24,28 @@ LoadScripts(){
         scripts.Push(A_LoopFileFullPath)
 }
 
+SortScripts(){
+    global scripts
+    Loop scripts.Length
+        Loop scripts.Length-1
+            if (scripts[A_Index] > scripts[A_Index+1]){
+                temp := scripts[A_Index]
+                scripts[A_Index] := scripts[A_Index+1]
+                scripts[A_Index+1] := temp
+            }
+}
+
 SwitchScript(step){
     global scripts,current
     if scripts.Length = 0
         return
-
     if current > 0
         StopCurrent()
-
     current += step
     if current < 1
         current := scripts.Length
     if current > scripts.Length
         current := 1
-
     Run scripts[current]
     RefreshGL()
 }
