@@ -30,7 +30,7 @@ GL_StartFirst(glStartScripts, &glStartCurrentIndex, glStartManagerGuiState) {
 
 GL_StopCurrent(glStopScripts, glStopCurrentIndex) {
     SplitPath glStopScripts[glStopCurrentIndex].path, &glStopCurrentFileName, &glStopCurrentDir
-    glStopCurrentHwndFile := glStopCurrentDir "\" glStopCurrentFileName ".txt"
+    glStopCurrentHwndFile := glStopCurrentDir "\\" glStopCurrentFileName ".txt"
 
     if !FileExist(glStopCurrentHwndFile)
         return
@@ -49,14 +49,33 @@ GL_RequestExitCurrent(glRequestExitScripts, glRequestExitCurrentIndex, glRequest
         return
 
     SplitPath glRequestExitScripts[glRequestExitCurrentIndex].path, &glRequestExitFileName, &glRequestExitDir
-    glRequestExitHwndFile := glRequestExitDir "\" glRequestExitFileName ".txt"
+    glRequestExitHwndFile := glRequestExitDir "\\" glRequestExitFileName ".txt"
 
     if !FileExist(glRequestExitHwndFile)
         return
 
-    glRequestExitHwnd := Trim(FileRead(glRequestExitHwndFile))
+    glRequestExitHwnd := GL_ReadHwndFile(glRequestExitHwndFile)
     if glRequestExitHwnd
         SendExitMessage(glRequestExitHwnd, glRequestExitReason)
+}
+
+GL_ReadHwndFile(glReadHwndFile) {
+    Loop 10 {
+        try {
+            glReadHwndValue := Trim(FileRead(glReadHwndFile))
+            if glReadHwndValue
+                return glReadHwndValue
+        } catch {
+            ; 子脚本可能正在创建、写入或删除句柄文件；文件存在并不代表此刻可读。
+        }
+
+        Sleep 20
+
+        if !FileExist(glReadHwndFile)
+            return ""
+    }
+
+    return ""
 }
 
 GL_ExitManager(glExitManagerScripts, glExitManagerCurrentIndex) {
