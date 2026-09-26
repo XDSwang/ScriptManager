@@ -35,9 +35,8 @@ SHIFT_WriteHwnd(shiftWriteHwndFile, shiftWriteHwndGui) {
     FileAppend(shiftWriteHwndGui.Hwnd, shiftWriteHwndFile)
 }
 
-SHIFT_Exit(shiftExitHwndFile, &shiftExitHeld, shiftExitInputGuard) {
-    Input_StopGuard(shiftExitInputGuard)
-    SHIFT_ReleaseKeys(&shiftExitHeld, shiftExitInputGuard)
+SHIFT_Exit(shiftExitHwndFile, &shiftExitHeld, shiftExitInputGuard, shiftExitStatusText) {
+    SHIFT_Stop(&shiftExitHeld, shiftExitStatusText, shiftExitInputGuard)
 
     if FileExist(shiftExitHwndFile)
         FileDelete shiftExitHwndFile
