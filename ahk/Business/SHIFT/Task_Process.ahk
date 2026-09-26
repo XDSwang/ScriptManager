@@ -18,7 +18,6 @@ SHIFT_Start(&shiftStartHeld, shiftStartStatusText, shiftStartInputGuard) {
 SHIFT_Stop(&shiftStopHeld, shiftStopStatusText, shiftStopInputGuard) {
     Input_StopGuard(shiftStopInputGuard)
     SHIFT_ReleaseKeys(&shiftStopHeld, shiftStopInputGuard)
-    Input_WaitPhysicalRelease()
     SHIFT_UpdateStatus(shiftStopStatusText, "● 待机 | F6 开启")
 }
 
@@ -37,6 +36,7 @@ SHIFT_WriteHwnd(shiftWriteHwndFile, shiftWriteHwndGui) {
 
 SHIFT_Exit(shiftExitHwndFile, &shiftExitHeld, shiftExitInputGuard, shiftExitStatusText) {
     SHIFT_Stop(&shiftExitHeld, shiftExitStatusText, shiftExitInputGuard)
+    Input_WaitPhysicalRelease()
 
     if FileExist(shiftExitHwndFile)
         FileDelete shiftExitHwndFile
