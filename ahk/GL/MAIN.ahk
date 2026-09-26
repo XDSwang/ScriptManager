@@ -10,7 +10,7 @@
 scriptFolder := A_ScriptDir "\..\Business"
 scripts := []
 current := 0
-glGui := 0
+managerGui := 0
 
 GL_LoadScripts()
 GL_Show()
