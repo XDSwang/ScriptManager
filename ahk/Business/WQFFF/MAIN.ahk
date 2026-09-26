@@ -16,7 +16,7 @@
 ; ★ → 注册 GL 的 0xB001 退出消息
 ; ★ → 注册 OnExit，保证 W/Q/F 和 Timer 最终被清理
 ;
-; ★ F6：*F6 → Task_Process_Start → Input_InputControl_StartGuard → WQFFF_Down → 启动 F 定时器 → 更新状态。
+; ★ F6：*F6 → Task_Process_Start → Input_InputControl_StartGuard → Task_Action_Down → 启动 F 定时器 → 更新状态。
 ; ★ F7：*F7 → Task_Process_Stop → 停止输入保护/Timer → Task_Action_ReleaseKeys → W/Q/F 全部释放 → 待机。
 ; ★ 用户操作：InputGuard 检测到新增物理输入 → WQFFF_PauseForInput → 停止 Timer、释放 W/Q/F → 所有记录干扰键释放后自动 Task_Process_Start。
 ; ★ GL 切换 / F8：GL 发 0xB001 → Task_Process_Exit → Task_Process_Stop → 删除 HWND 文件 → ExitApp。
