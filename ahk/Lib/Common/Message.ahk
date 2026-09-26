@@ -1,28 +1,16 @@
 #Requires AutoHotkey v2.0
 
-; ★ GL 通信流程：
-; ★ 子脚本启动 → 把自己的 GUI HWND 写入 MAIN.ahk.txt
-; ★ GL 切换/F8 → 读取这个 HWND
-; ★ → PostMessage(0xB001, 退出原因)
-; ★ → 子脚本 OnMessage 收到消息
-; ★ → 执行自己的停止/清理流程
-; ★ → 删除 MAIN.ahk.txt
-; ★ → GL 看到文件消失后，才认为子脚本已经退出完成。
-;
-; ★ 退出原因：
-; ★ 1 = 切换脚本
-; ★ 2 = 管理器 F8 主动退出
-class GLMessage {
+; Common_Message_Exit - 保存 GL 管理器与子脚本通信所使用的消息编号和退出原因；参数：无。
+class Common_Message_Exit {
     static ExitMessage := 0xB001
     static ExitReasonSwitch := 1
     static ExitReasonManager := 2
 }
 
-; ★ SendExitMessage：这里只负责“发消息”，不负责等待、不负责释放按键。
-; ★ 真正的清理必须由子脚本自己的 Process/Action 完成。
-SendExitMessage(glSendExitMessageHwnd, glSendExitMessageReason := GLMessage.ExitReasonSwitch) {
-    if glSendExitMessageHwnd
-        PostMessage(GLMessage.ExitMessage, glSendExitMessageReason, 0, , "ahk_id " glSendExitMessageHwnd)
+; Common_Message_SendExit - 向指定 hwnd 发送统一退出消息；参数：hwnd=目标窗口句柄，reason=退出原因，可省略。
+Common_Message_SendExit(commonMessageSendExitHwnd, commonMessageSendExitReason := Common_Message_Exit.ExitReasonSwitch) {
+    if commonMessageSendExitHwnd
+        PostMessage(Common_Message_Exit.ExitMessage, commonMessageSendExitReason, 0, , "ahk_id " commonMessageSendExitHwnd)
 
     return true
 }
