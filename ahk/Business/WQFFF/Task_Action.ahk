@@ -1,15 +1,21 @@
 #Requires AutoHotkey v2.0
 
 WQFFF_Down() {
-    Send "{w down}"
-    Send "{q down}"
+    SendEvent "{w down}"
+    SendEvent "{q down}"
 }
 
 WQFFF_Up() {
-    Send "{w up}"
-    Send "{q up}"
+    SendEvent "{w up}"
+    SendEvent "{q up}"
 }
 
 WQFFF_PressF() {
-    Send "{f}"
+    SendEvent "{f down}"
+    SendEvent "{f up}"
+}
+
+WQFFF_UpdateStatus(text) {
+    global statusText
+    statusText.Text := text
 }
