@@ -29,21 +29,37 @@ GL_StartFirst(glStartScripts, &glStartCurrentIndex, glStartManagerGuiState) {
 }
 
 GL_StopCurrent(glStopScripts, glStopCurrentIndex) {
-    SplitPath glStopScripts[glStopCurrentIndex].path, &glStopFileName, &glStopDir
-    glStopHwndFile := glStopDir "\" glStopFileName ".txt"
+    GL_RequestExitCurrent(glStopScripts, glStopCurrentIndex, GLMessage.ExitReasonSwitch)
 
-    if !FileExist(glStopHwndFile)
-        return
-
-    glStopHwnd := Trim(FileRead(glStopHwndFile))
-    if glStopHwnd
-        SendExitMessage(glStopHwnd)
+    SplitPath glStopScripts[glStopCurrentIndex].path, &glStopCurrentFileName, &glStopCurrentDir
+    glStopCurrentHwndFile := glStopCurrentDir "\" glStopCurrentFileName ".txt"
 
     Loop {
         Sleep 50
-        if !FileExist(glStopHwndFile)
+        if !FileExist(glStopCurrentHwndFile)
             break
     }
+}
+
+GL_RequestExitCurrent(glRequestExitScripts, glRequestExitCurrentIndex, glRequestExitReason) {
+    if glRequestExitCurrentIndex < 1 || glRequestExitCurrentIndex > glRequestExitScripts.Length
+        return
+
+    SplitPath glRequestExitScripts[glRequestExitCurrentIndex].path, &glRequestExitFileName, &glRequestExitDir
+    glRequestExitHwndFile := glRequestExitDir "\" glRequestExitFileName ".txt"
+
+    if !FileExist(glRequestExitHwndFile)
+        return
+
+    glRequestExitHwnd := Trim(FileRead(glRequestExitHwndFile))
+    if glRequestExitHwnd
+        SendExitMessage(glRequestExitHwnd, glRequestExitReason)
+}
+
+GL_ExitManager(glExitManagerScripts, glExitManagerCurrentIndex) {
+    GL_RequestExitCurrent(glExitManagerScripts, glExitManagerCurrentIndex, GLMessage.ExitReasonManager)
+    GL_LogError("GL F8 退出", "管理器主动结束；已通知当前子脚本退出")
+    ExitApp
 }
 
 GL_Show() {
