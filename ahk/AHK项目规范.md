@@ -556,7 +556,7 @@ F8：
 每个受管理子脚本使用：
 
 ```text
-A_ScriptDir "\\ " A_ScriptName ".txt"
+A_ScriptDir "\\" A_ScriptName ".txt"
 ```
 
 例如入口为：
