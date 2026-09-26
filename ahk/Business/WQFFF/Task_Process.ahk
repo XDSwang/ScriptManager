@@ -44,9 +44,8 @@ WQFFF_WriteHwnd(wqfffWriteHwndFile, wqfffWriteHwndGui) {
     FileAppend(wqfffWriteHwndGui.Hwnd, wqfffWriteHwndFile)
 }
 
-WQFFF_Exit(wqfffExitHwndFile, &wqfffExitRunning, wqfffExitPressTimer, wqfffExitInputGuard) {
-    Input_StopGuard(wqfffExitInputGuard)
-    WQFFF_ReleaseKeys(&wqfffExitRunning, wqfffExitPressTimer, wqfffExitInputGuard)
+WQFFF_Exit(wqfffExitHwndFile, &wqfffExitRunning, wqfffExitPressTimer, wqfffExitInputGuard, wqfffExitStatusText) {
+    WQFFF_Stop(&wqfffExitRunning, wqfffExitPressTimer, wqfffExitStatusText, wqfffExitInputGuard)
 
     if FileExist(wqfffExitHwndFile)
         FileDelete wqfffExitHwndFile
