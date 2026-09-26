@@ -7,7 +7,7 @@
 ; ★ ④ 按住 W/Q
 ; ★ ⑤ 启动 F 定时器
 ; ★ ⑥ 更新 GUI
-Task_Process_Start(&wqfffStartRunning, &wqfffStartFInterval, &wqfffStartPressTimer, wqfffStartStatusText, wqfffStartInputGuard) {
+Task_Process_Start(&wqfffStartRunning, wqfffStartFInterval, &wqfffStartPressTimer, wqfffStartStatusText, wqfffStartInputGuard) {
     if wqfffStartRunning
         return
 
