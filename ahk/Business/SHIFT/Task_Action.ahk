@@ -1,9 +1,20 @@
 #Requires AutoHotkey v2.0
 
 SHIFT_Down() {
-    Send "{Shift down}"
+    SendEvent "{LShift down}"
 }
 
 SHIFT_Up() {
-    Send "{Shift up}"
+    SendEvent "{LShift up}"
+}
+
+SHIFT_UpdateStatus(text) {
+    global statusText
+    statusText.Text := text
+}
+
+SHIFT_ReleaseKeys(*) {
+    global shiftHeld
+    SendEvent "{LShift up}"
+    shiftHeld := false
 }
