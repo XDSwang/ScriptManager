@@ -2,8 +2,6 @@
 #SingleInstance Force
 #UseHook
 
-; GL 管理器
-
 #Include ../Lib/Common/GUI.ahk
 #Include ../Lib/Common/Message.ahk
 
@@ -33,7 +31,12 @@ SwitchScript(step){
         return
 
     if current>0
+    {
         SendEvent "{F7}"
+        Sleep 300
+        SendMessage 0xB001,0,0,"","ahk_exe AutoHotkey.exe"
+        Sleep 300
+    }
 
     current += step
     if current<1
@@ -50,7 +53,7 @@ ShowGL(){
     glGui := Gui("+AlwaysOnTop", "GL管理器")
     glGui.BackColor := "000000"
     glGui.SetFont("s9 cFFFFFF", "Microsoft YaHei")
-    glGui.AddText("vList", "GL 管理器")
+    glGui.AddText("vList", "")
     glGui.Show("w300 h35")
     WinSetTransparent(220, glGui)
     RefreshGL()
@@ -60,16 +63,14 @@ RefreshGL(){
     global scripts,current,glGui
     if !glGui
         return
-
     text := ""
     Loop scripts.Length
     {
-        name := scripts[A_Index]
-        SplitPath name,,,&fileName
+        SplitPath scripts[A_Index],,&,&name
         if A_Index=current
-            text .= "[" fileName "] "
+            text .= "当前:" name " "
         else
-            text .= fileName " "
+            text .= name " "
     }
     glGui["List"].Text := text
 }
