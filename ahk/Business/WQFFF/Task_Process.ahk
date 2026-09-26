@@ -22,7 +22,7 @@ WQFFF_Stop(&wqfffStopRunning, wqfffStopPressTimer, wqfffStopStatusText, wqfffSto
     WQFFF_UpdateStatus(wqfffStopStatusText, "● 待机 | F6 开启")
 }
 
-WQFFF_PauseForInput(&wqfffPauseRunning, &wqfffPausePressTimer, wqfffPauseStatusText) {
+WQFFF_PauseForInput(&wqfffPauseRunning, wqfffPausePressTimer, wqfffPauseStatusText) {
     wqfffPauseRunning := false
     SetTimer(wqfffPausePressTimer, 0)
     WQFFF_Up()
@@ -45,7 +45,6 @@ WQFFF_WriteHwnd(wqfffWriteHwndFile, wqfffWriteHwndGui) {
 
 WQFFF_Exit(wqfffExitHwndFile, &wqfffExitRunning, wqfffExitPressTimer, wqfffExitInputGuard, wqfffExitStatusText) {
     WQFFF_Stop(&wqfffExitRunning, wqfffExitPressTimer, wqfffExitStatusText, wqfffExitInputGuard)
-    Input_WaitPhysicalRelease()
 
     if FileExist(wqfffExitHwndFile)
         FileDelete wqfffExitHwndFile
