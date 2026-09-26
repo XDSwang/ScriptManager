@@ -48,16 +48,16 @@ GL_StopCurrent() {
 }
 
 GL_Show() {
-    global glGui
-    glGui := GLGui.Create("GL管理器", 300, 35)
+    global managerGui
+    managerGui := GLGui.Create("GL管理器", 300, 35)
     GL_Refresh()
 }
 
 GL_Refresh() {
-    global scripts, current, glGui
+    global scripts, current, managerGui
 
-    if !glGui
+    if !managerGui
         return
 
-    GLGui.UpdateList(glGui, scripts, current)
+    GLGui.UpdateList(managerGui, scripts, current)
 }
