@@ -24,7 +24,7 @@ GL_LoadScripts(glLoadScriptsFolder) {
 GL_SortScripts(glSortScriptsList) {
     Loop glSortScriptsList.Length {
         Loop glSortScriptsList.Length - 1 {
-            if (glSortScriptsList[A_Index].name > glSortScriptsList[A_Index + 1].name) {
+            if (StrCompare(glSortScriptsList[A_Index].name, glSortScriptsList[A_Index + 1].name) > 0) {
                 glSortScriptsTemp := glSortScriptsList[A_Index]
                 glSortScriptsList[A_Index] := glSortScriptsList[A_Index + 1]
                 glSortScriptsList[A_Index + 1] := glSortScriptsTemp
