@@ -624,7 +624,7 @@ ahk/Lib/Input/InputControl.ahk
 
 ```ahk
 shiftMainControlKeys := ["F6", "F7"]
-shiftMainInputGuard := Input_CreateGuard(shiftMainControlKeys)
+shiftMainInputGuard := Common_InputControl_CreateGuard(shiftMainControlKeys)
 ```
 
 这里的控制键是本脚本用于启动、暂停、退出等控制功能的按键。控制键会被输入保护忽略，因此：
