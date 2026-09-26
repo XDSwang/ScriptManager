@@ -1,17 +1,32 @@
 #Requires AutoHotkey v2.0
 
-WQFFF_Start(&wqfffStartRunning, wqfffStartFInterval, wqfffStartPressTimer, wqfffStartStatusText) {
+WQFFF_Start(&wqfffStartRunning, wqfffStartFInterval, wqfffStartPressTimer, wqfffStartStatusText, wqfffStartInputGuard) {
+    if wqfffStartRunning
+        return
+
+    Input_StartGuard(
+        wqfffStartInputGuard,
+        (*) => WQFFF_PauseForInput(&wqfffStartRunning, wqfffStartPressTimer, wqfffStartStatusText),
+        (*) => WQFFF_Start(&wqfffStartRunning, wqfffStartFInterval, wqfffStartPressTimer, wqfffStartStatusText, wqfffStartInputGuard)
+    )
+
     wqfffStartRunning := true
     WQFFF_Down()
     SetTimer(wqfffStartPressTimer, wqfffStartFInterval)
     WQFFF_UpdateStatus(wqfffStartStatusText, "运行-WQ按住中F循环中/释放-按F7暂停")
 }
 
-WQFFF_Stop(&wqfffStopRunning, wqfffStopPressTimer, wqfffStopStatusText) {
-    wqfffStopRunning := false
-    SetTimer(wqfffStopPressTimer, 0)
-    WQFFF_Up()
+WQFFF_Stop(&wqfffStopRunning, wqfffStopPressTimer, wqfffStopStatusText, wqfffStopInputGuard) {
+    Input_StopGuard(wqfffStopInputGuard)
+    WQFFF_ReleaseKeys(&wqfffStopRunning, wqfffStopPressTimer, wqfffStopInputGuard)
     WQFFF_UpdateStatus(wqfffStopStatusText, "● 待机 | F6 开启")
+}
+
+WQFFF_PauseForInput(&wqfffPauseRunning, wqfffPausePressTimer, wqfffPauseStatusText) {
+    wqfffPauseRunning := false
+    SetTimer(wqfffPausePressTimer, 0)
+    WQFFF_Up()
+    WQFFF_UpdateStatus(wqfffPauseStatusText, "● 检测到用户操作，已暂停 | 松开后自动继续")
 }
 
 WQFFF_PressFTimer(&wqfffTimerRunning) {
@@ -28,8 +43,9 @@ WQFFF_WriteHwnd(wqfffWriteHwndFile, wqfffWriteHwndGui) {
     FileAppend(wqfffWriteHwndGui.Hwnd, wqfffWriteHwndFile)
 }
 
-WQFFF_Exit(wqfffExitHwndFile, &wqfffExitRunning, wqfffExitPressTimer) {
-    WQFFF_ReleaseKeys(&wqfffExitRunning, wqfffExitPressTimer)
+WQFFF_Exit(wqfffExitHwndFile, &wqfffExitRunning, wqfffExitPressTimer, wqfffExitInputGuard) {
+    Input_StopGuard(wqfffExitInputGuard)
+    WQFFF_ReleaseKeys(&wqfffExitRunning, wqfffExitPressTimer, wqfffExitInputGuard)
 
     if FileExist(wqfffExitHwndFile)
         FileDelete wqfffExitHwndFile
