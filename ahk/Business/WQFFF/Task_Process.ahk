@@ -40,7 +40,7 @@ Task_Process_PauseForInput(&wqfffPauseRunning, wqfffPausePressTimer, wqfffPauseS
 }
 
 ; ★ Timer 到时进入这里，再调用 Action 中真正的 F 按键动作。
-Task_Action_PressFTimer(&wqfffTimerRunning) {
+Task_Process_PressFTimer(&wqfffTimerRunning) {
     if !wqfffTimerRunning
         return
 
