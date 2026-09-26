@@ -14,6 +14,7 @@ managerGui := 0
 
 GL_LoadScripts()
 GL_Show()
+GL_StartFirst()
 
 ^Up::GL_SwitchScript(1)
 ^Down::GL_SwitchScript(-1)
