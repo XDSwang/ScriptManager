@@ -20,73 +20,71 @@ ShowGL()
 LoadScripts(){
     global scripts, scriptFolder
     scripts := []
-    Loop Files scriptFolder "\*.ahk", "R"
+
+    Loop Files scriptFolder "\*\MAIN.ahk"
         scripts.Push(A_LoopFileFullPath)
 }
 
 SortScripts(){
     global scripts
+
     Loop scripts.Length
-        Loop scripts.Length-1
-            if (scripts[A_Index] > scripts[A_Index+1]){
+        Loop scripts.Length - 1
+            if (scripts[A_Index] > scripts[A_Index + 1]){
                 temp := scripts[A_Index]
-                scripts[A_Index] := scripts[A_Index+1]
-                scripts[A_Index+1] := temp
+                scripts[A_Index] := scripts[A_Index + 1]
+                scripts[A_Index + 1] := temp
             }
 }
 
 SwitchScript(step){
-    global scripts,current
+    global scripts, current
+
     if scripts.Length = 0
         return
+
     if current > 0
         StopCurrent()
+
     current += step
     if current < 1
         current := scripts.Length
     if current > scripts.Length
         current := 1
+
     Run scripts[current]
     RefreshGL()
 }
 
 StopCurrent(){
-    global scripts,current
-    SplitPath scripts[current], &dir, &name
-    hwndFile := dir "\" name ".txt"
+    global scripts, current
+
+    SplitPath scripts[current], &fileName, &dir
+    hwndFile := dir "\" fileName ".txt"
+
     if FileExist(hwndFile){
-        hwnd := FileRead(hwndFile)
+        hwnd := Trim(FileRead(hwndFile))
         if hwnd
-            SendMessage 0xB001,0,0,,"ahk_id " hwnd
+            SendMessage 0xB001, 0, 0,, "ahk_id " hwnd
         FileDelete hwndFile
     }
+
     SendEvent "{F7}"
     Sleep 300
 }
 
 ShowGL(){
     global glGui
-    glGui := Gui("+AlwaysOnTop", "GL管理器")
-    glGui.BackColor := "000000"
-    glGui.SetFont("s9 cFFFFFF", "Microsoft YaHei")
-    glGui.AddText("vList", "")
-    glGui.Show("w300 h35")
-    WinSetTransparent(220, glGui)
+
+    glGui := GLGui.Create("GL管理器", 300, 35)
     RefreshGL()
 }
 
 RefreshGL(){
-    global scripts,current,glGui
+    global scripts, current, glGui
+
     if !glGui
         return
-    text := ""
-    Loop scripts.Length
-    {
-        SplitPath scripts[A_Index],,,&name
-        if A_Index=current
-            text .= "当前:" name " "
-        else
-            text .= name " "
-    }
-    glGui["List"].Text := text
+
+    GLGui.UpdateList(glGui, scripts, current)
 }
