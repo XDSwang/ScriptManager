@@ -1,2 +1,5 @@
 # AutoHotkey运行生成的句柄文件
 *.ahk.txt
+
+# AutoHotkey运行生成的错误日志
+Error.log
