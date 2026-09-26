@@ -95,13 +95,13 @@ list
 gui
 ```
 
-除非名称属于 AHK/API 固定对象或在极小范围内具有明确语义。
+除非名称属于 AHK/API 固定对象，或在极小范围内具有明确语义。
 
 ### 3.3 函数外变量
 
 函数外变量不是默认方案。
 
-确实无法避免时，必须使用：
+确实无法避免时，使用：
 
 ```text
 当前脚本名称 + 实际含义
@@ -136,200 +136,205 @@ Action / 公共库
 
 不要通过隐藏的全局变量或共享脚本变量传递状态。
 
-### 3.5 ★ 全项目函数命名原则
-**函数命名必须同时解决两个问题：同级脚本之间的归属清晰，以及跨目录引用时的唯一归属清晰。**
+### 3.5 全项目函数命名原则
 
-命名层级不是简单由“文件放在哪里”决定，而要结合函数的**使用范围**确定。
+函数命名必须同时解决两个问题：
 
-#### ★ 3.5.1 同级目录内调用：脚本名称 + 功能
+1. 同级脚本之间能够明确判断函数来源。
+2. 跨目录引用时能够明确判断公共模块的真实归属。
+
+**函数命名首先看使用范围，再看真实脚本和模块归属。**
+
+#### 3.5.1 同级目录内部调用：脚本名称 + 功能
+
 当多个 `.ahk` 文件处于同一业务/模块目录，并且函数只在该目录内部相互调用时，采用：
 
+```text
 具体脚本名称_具体功能
+```
 
 例如：
-- Business/SHIFT/MAIN.ahk → MAIN()
-- Business/SHIFT/Task_Process.ahk → Task_Process_Start()
-- Business/SHIFT/Task_Action.ahk → Task_Action_Down()
-- Business/WQFFF/Task_Process.ahk → Task_Process_Start()
-- Business/WQFFF/Task_Action.ahk → Task_Action_Down()
-- GL/GL_Config.ahk → GL_Config_GetManagedFolder()
-- GL/GL_Process.ahk → GL_Process_LoadScripts()
-- GL/GL_Action.ahk → GL_Action_SwitchScript()
 
-这里的“脚本名称”就是当前目录下实际 `.ahk` 文件的脚本名（不含扩展名）。例如 `Task_Process.ahk` 的函数使用 `Task_Process_*`，不能因为它位于 `SHIFT` 目录就改成 `SHIFT_*`。
+- `Business/SHIFT/MAIN.ahk` → `MAIN()`
+- `Business/SHIFT/Task_Process.ahk` → `Task_Process_Start()`
+- `Business/SHIFT/Task_Action.ahk` → `Task_Action_Down()`
+- `Business/WQFFF/Task_Process.ahk` → `Task_Process_Start()`
+- `Business/WQFFF/Task_Action.ahk` → `Task_Action_Down()`
+- `GL/GL_Config.ahk` → `GL_Config_GetManagedFolder()`
+- `GL/GL_Process.ahk` → `GL_Process_LoadScripts()`
+- `GL/GL_Action.ahk` → `GL_Action_SwitchScript()`
 
-重点是：**同级目录内部调用，不需要把上级业务目录名再次塞进函数名；同级目录本身已经提供了第一层命名空间。**
+这里的“脚本名称”就是当前目录下实际 `.ahk` 文件的脚本名，不含扩展名。
 
-#### ★ 3.5.2 跨目录引用：提升为公共可引用模块命名
-当某个脚本中的函数需要被**其他目录、其他业务模块或其他独立脚本引用**时，该脚本已经具有“公共可引用模块”的性质。
+例如 `Task_Process.ahk` 的函数使用 `Task_Process_*`，不能因为它位于 `SHIFT` 目录就改成 `SHIFT_*`。
 
-此时不能继续只使用简单的：
+**同级目录内部调用，不需要把上级业务目录名再次塞进函数名；目录本身已经提供了第一层命名空间。**
 
+因此：
+
+- `SHIFT/Task_Process.ahk` → `Task_Process_Start()`
+- `WQFFF/Task_Process.ahk` → `Task_Process_Start()`
+
+这是允许的，因为两个函数属于不同目录，目录已经区分了它们。
+
+#### 3.5.2 跨目录引用：使用公共模块命名
+
+当一个函数需要被其他目录、其他业务模块或其他独立脚本复用时，不能继续只依赖：
+
+```text
 具体脚本名称_具体功能
+```
 
-因为调用方可能来自多个目录，容易出现同名函数、归属不明确或后续扩展冲突。
+因为跨目录后，同名脚本可能存在，单靠脚本名称不足以稳定表达公共能力的真实归属。
 
-应提升为：
+处理原则：
 
-分类_具体脚本名称_具体功能
+1. **优先将真正可复用的能力抽取到 `Lib/` 公共库。**
+2. 公共库函数使用：
+   ```text
+   分类_具体脚本名称_具体功能
+   ```
+3. 分类必须表示公共能力本身，不能使用调用方业务目录名称。
+4. 所有调用方都使用公共模块自己的稳定名称。
 
-其中“分类”必须明确表示该模块所属的公共能力类别。
+当前公共能力分类包括：
 
-例如 Lib 下的公共能力：
-- Lib/Common/GUI.ahk → Common_GUI_Create()
-- Lib/Common/Message.ahk → Common_Message_SendExit()
-- Lib/Common/Log.ahk → Common_Log_Error()
-- Lib/Action/Keyboard.ahk → Action_Keyboard_KeyDown()
-- Lib/Action/Timer.ahk → Action_Timer_Start()
-- Lib/Action/Window.ahk → Action_Window_Activate()
-- Lib/Input/InputControl.ahk → Input_InputControl_StartGuard()
-- Lib/File/FileControl.ahk → File_FileControl_Read()
+- `Common`
+- `Action`
+- `Input`
+- `File`
 
-**Common、Action、Input、File 是公共能力分类；具体文件名才是实际脚本名称。**
+例如：
 
-#### ★ 3.5.3 “公共库性质”与“公共库目录”不是同一个概念
-必须区分：
+- `Lib/Common/GUI.ahk` → `Common_GUI_Create()`
+- `Lib/Common/Message.ahk` → `Common_Message_SendExit()`
+- `Lib/Common/Log.ahk` → `Common_Log_Error()`
+- `Lib/Action/Keyboard.ahk` → `Action_Keyboard_KeyDown()`
+- `Lib/Action/Timer.ahk` → `Action_Timer_Start()`
+- `Lib/Action/Window.ahk` → `Action_Window_Activate()`
+- `Lib/Input/InputControl.ahk` → `Input_InputControl_StartGuard()`
+- `Lib/File/FileControl.ahk` → `File_FileControl_Read()`
 
-- **公共库目录**：物理上位于 Lib 下的可复用模块。
-- **公共库性质**：函数虽然可能位于业务目录，但已经需要被其他目录/业务模块引用，因此必须具有明确、稳定、不可混淆的跨目录名称。
+**跨目录引用时，命名跟随被引用模块自身的真实归属，而不是跟随调用方。**
 
-因此，不能简单规定“只有 Lib 里的函数才需要明确归属”。
+#### 3.5.3 公共能力与公共库目录的关系
 
-真正的判断标准是：
+“公共库目录”和“公共能力”是两个不同概念：
 
-1. 只在同级目录内部使用 → 使用“脚本名称_功能”。
-2. 被其他目录/独立模块引用 → 提升为“分类_脚本名称_功能”。
-3. 跨目录引用的模块必须有稳定的归属前缀，避免调用方根据文件路径猜测来源。
+- **公共库目录**：物理上位于 `Lib/` 下的可复用模块。
+- **公共能力**：从职责上已经适合被多个目录/业务模块复用的能力。
 
-#### ★ 3.5.4 目录名与实际脚本名
-必须严格区分：
+判断一个函数是否应该公共化，重点不是“当前文件是不是已经在 Lib”，而是：
 
-目录 = 能力分类
+1. 是否被多个目录/业务模块复用。
+2. 是否与某个具体业务流程解耦。
+3. 是否能够通过参数和返回值提供通用能力。
+4. 是否不需要保存调用方的隐藏业务状态。
+
+如果业务目录中的函数后来真的需要跨目录复用，应优先把通用能力抽取到 `Lib/`，再按照公共库规则命名。
+
+不要为了跨目录调用而简单把 `SHIFT`、`WQFFF` 等业务目录名称加到函数名前面。
+
+#### 3.5.4 目录、文件与函数的对应关系
+
+统一理解为：
+
+```text
+目录 = 模块/能力的物理组织层级
 文件 = 实际脚本/模块名称
-函数 = 来源 + 功能
+函数 = 脚本名称 + 功能
+公共函数 = 分类 + 脚本名称 + 功能
+```
 
 例如：
 
+```text
 Lib/Input/InputControl.ahk
+```
 
-- Input = 公共能力分类。
-- InputControl = 实际脚本名称。
-- Input_InputControl_StartGuard() = 完整公共函数名称。
+其中：
 
-因此禁止：
-- Common_InputControl_StartGuard()
-- Input_StartGuard()
-- StartGuard()
+- `Input` = 公共能力分类。
+- `InputControl` = 实际脚本名称。
+- `Input_InputControl_StartGuard()` = 完整公共函数名称。
+
+因此不能写成：
+
+- `Common_InputControl_StartGuard()`
+- `Input_StartGuard()`
+- `StartGuard()`
 
 同理：
 
+```text
 Lib/Action/Keyboard.ahk
 → Action_Keyboard_KeyDown()
 
 Lib/File/FileControl.ahk
 → File_FileControl_Read()
+```
 
-#### ★ 3.5.5 核心原则
-函数名必须让人不查看调用代码，也能判断函数属于哪个实际脚本/模块。
+#### 3.5.5 多级分类
 
-命名优先级：
-1. 先判断函数是否只在同级目录内部使用。
-2. 如果是同级内部使用，采用“脚本名称_功能”。
-3. 如果需要跨目录引用，采用“分类_脚本名称_功能”。
-4. 分类必须稳定，不能根据调用方临时改变。
-5. 实际脚本名称不能省略或人为拆分。
-6. 禁止使用无法判断归属的裸函数名。
+项目允许存在多级公共分类。
 
-#### ★ 3.5.6 多级分类必须完整表达真实归属
+当公共模块确实存在多个有实际意义的分类层级时，函数名称应按照真实归属从上到下表达：
 
-项目允许存在多级分类。
+```text
+上级分类_下级分类_具体脚本名称_具体功能
+```
 
-当一个公共可引用模块存在多级真实归属时，函数名称必须按照**实际归属层级从上到下完整表达**，不能只保留其中某一级。
+例如，假设真实公共模块为：
 
-统一原则：
+```text
+Lib/System/Automation/Task_Process.ahk
+```
 
-`上级分类_下级分类_具体脚本名称_具体功能`
+则可以定义为：
 
-例如，假设某模块实际归属为：
+```text
+System_Automation_Task_Process_Start()
+```
 
-`Lib/XXX/YYY/Keyboard.ahk`
+前提是 `System` 与 `Automation` 都是项目中真实存在、能够说明模块归属的分类。
 
-则应根据真实模块归属定义为：
-
-`XXX_YYY_Keyboard_KeyDown()`
-
-而不能写成：
-
-`YYY_Keyboard_KeyDown()`
-
-也不能写成：
-
-`Keyboard_KeyDown()`
-
-因为后两种写法会丢失真实归属，跨目录引用后无法准确判断函数属于哪个模块。
-
-**命名层级必须与项目真实分类层级一致。**
+不能为了让名称“看起来完整”而人为增加分类，也不能为了缩短名称而删除影响唯一归属的真实分类。
 
 判断原则：
 
 1. 先确定函数实际属于哪个具体脚本。
-2. 再向上追溯该脚本的真实分类。
-3. 如果存在上级分类，则继续向上追溯。
-4. 所有会影响模块唯一归属的分类层级，都必须进入函数名称。
-5. 最后才追加具体功能。
-6. 不允许为了缩短名称而省略真实归属层级。
-7. 不允许人为增加不存在的分类层级。
-8. 不允许根据“当前调用方”决定命名；命名必须依据被调用模块自身的真实归属。
+2. 再确定该脚本的真实公共能力分类。
+3. 存在真实且有模块语义的上级分类时继续向上表达。
+4. 最后追加具体功能。
+5. 不根据当前调用方决定分类。
+6. 不把业务目录名称自动当成公共分类。
 
-因此，函数名称本质上是：
+**函数名应表达真实模块归属，而不是机械复制完整文件系统路径。**
 
-`完整真实归属路径 + 具体脚本名称 + 具体功能`
+#### 3.5.6 核心原则
 
-但函数名**不是简单机械复制完整文件系统路径**；只纳入有实际模块语义、能够确定归属的分类层级。
+函数名的目标是：
 
-例如：
+> **不查看函数定义位置，仅看函数名，也能够判断它具体属于哪个脚本或公共模块。**
 
-`Business/SHIFT/Task_Process.ahk`
+命名判断顺序：
 
-在 `SHIFT` 目录内部使用时，应保持：
+1. 判断函数是否只在同级目录内部使用。
+2. 如果是，使用 `具体脚本名称_具体功能`。
+3. 如果需要跨目录复用，优先抽取到 `Lib/`。
+4. 公共库使用 `分类_具体脚本名称_具体功能`。
+5. 分类必须来自被调用模块自身的真实能力归属。
+6. 禁止使用调用方业务目录作为公共分类。
+7. 禁止使用无法判断归属的裸函数名。
 
-`Task_Process_Start()`
+#### 3.5.7 新增或扩展函数
 
-如果以后这个脚本中的能力真的需要被其他目录公开引用，则应把可复用能力抽到公共库，或者在项目明确存在真实公共分类时，按：
+新增函数时必须先确定使用范围：
 
-`分类_具体脚本名称_具体功能`
+- 同级内部函数：`脚本名称_功能`。
+- 跨目录可复用函数：优先抽取到公共库，并使用 `分类_脚本名称_功能`。
 
-进行提升。
-
-例如某个真实公共模块位于：
-
-`Lib/Automation/Task_Process.ahk`
-
-则跨目录公开函数可定义为：
-
-`Automation_Task_Process_Start()`
-
-如果再存在真实且有模块语义的上级分类：
-
-`Lib/System/Automation/Task_Process.ahk`
-
-则：
-
-`System_Automation_Task_Process_Start()`
-
-注意：**不能因为原来脚本位于 `Business/SHIFT`，就把 `SHIFT` 人为加入所有同级函数名；也不能把调用方目录名称当成公共分类。**
-
-核心要求只有一个：
-
-> **看到函数名，就必须能够明确判断“这个函数具体是谁的”。**
-
-#### ★ 3.5.6 新增模块命名
-新增函数时必须先确定其使用范围：
-
-- 同级内部函数：脚本名称_功能。
-- 跨目录可复用函数：分类_脚本名称_功能。
-
-如果一个原本只在同级内部使用的函数后来开始被其他目录引用，应在扩展范围时同步提升其命名层级，并检查所有调用点。
+如果一个原本只在同级内部使用的函数后来开始被其他目录复用，应在扩展范围时重新判断其职责，并在需要时将通用能力抽取到公共库，同时检查所有调用点。
 
 ### 3.6 变量与函数命名的共同原则
 
@@ -551,7 +556,7 @@ F8：
 每个受管理子脚本使用：
 
 ```text
-A_ScriptDir "\\" A_ScriptName ".txt"
+A_ScriptDir "\\ " A_ScriptName ".txt"
 ```
 
 例如入口为：
@@ -734,12 +739,12 @@ Lib/File/FileControl.ahk
 
 例如：
 
-`Task_Process.ahk` → `Task_Process_*`
-`Task_Action.ahk` → `Task_Action_*`
+- `Task_Process.ahk` → `Task_Process_*`
+- `Task_Action.ahk` → `Task_Action_*`
 
 `MAIN.ahk` 作为单独入口脚本，可以使用 `MAIN()` 作为入口函数。
 
-不能因为业务目录名已经明确，就把业务目录名重复加入同级函数，例如不要把 `SHIFT/Task_Process.ahk` 写成 `SHIFT_Start()`。
+不能因为业务目录名已经明确，就把业务目录名重复加入同级函数名，例如不要把 `SHIFT/Task_Process.ahk` 写成 `SHIFT_Start()`。
 
 ## 14. 日志规范
 
@@ -749,7 +754,13 @@ Lib/File/FileControl.ahk
 A_ScriptDir\Error.log
 ```
 
-公共库函数的命名必须遵守“分类_具体脚本名称_具体功能”的最高优先级规则。具体分类取决于公共库实际所在能力目录：
+公共库函数的命名遵守：
+
+```text
+分类_具体脚本名称_具体功能
+```
+
+当前分类包括：
 
 ```text
 Common_具体脚本名称_具体功能
@@ -759,12 +770,6 @@ File_具体脚本名称_具体功能
 ```
 
 例如 `Lib/Common/Log.ahk` 中的错误记录能力使用：
-
-```text
-Common_Log_Error()
-```
-
-例如 `Lib/Common/Log.ahk` 中的错误记录能力应使用：
 
 ```text
 Common_Log_Error()
@@ -780,21 +785,21 @@ Common_Log_Error()
 
 新增或修改功能时：
 
-1. **先确定真实具体脚本名称。**
-2. **如果属于同级目录内部使用，直接使用 `具体脚本名称_具体功能`；例如 `Task_Process_Start()`、`Task_Action_Down()`。`MAIN.ahk` 的入口函数可使用 `MAIN()`。**
-3. **如果属于公共库或真正需要跨目录公开复用，必须按照真实能力分类套用 `分类_具体脚本名称_具体功能`；例如 `Common_`、`Action_`、`Input_`、`File_`。**
-4. 不允许因为业务目录名而人为增加 `SHIFT_`、`WQFFF_` 等前缀；业务目录是目录级命名空间，不是同级脚本函数名前缀。
-4. 先判断公共库是否已有能力。
-5. 有则直接调用。
-6. 没有且属于当前脚本专用动作，则写入当前脚本 Action。
-7. 由 Process 负责流程组合。
-8. MAIN 负责入口。
-9. 状态优先保持在函数局部。
-10. 优先使用参数和返回值传递数据。
-11. 优先让函数名表达“真实脚本 + 功能”。
-12. 禁止为了省字使用 `Start()`、`Stop()`、`Exit()`、`Gui()`、`Message()` 等无归属通用名称。
-13. 不为了调用方便制造全局变量。
-14. 公共函数增加“一条作用 + 参数”源码注释。
-15. 在公共库函数总文档中同步真实函数说明。
-16. 新增扩展时，先确定真实脚本名称，再开始写函数。
-
+1. 先确定实际脚本名称和模块职责。
+2. 判断函数是否只在同级目录内部使用。
+3. 同级内部函数使用 `具体脚本名称_具体功能`；例如 `Task_Process_Start()`、`Task_Action_Down()`、`MAIN()`。
+4. 如果需要跨目录复用，优先判断是否应该抽取到 `Lib/` 公共库。
+5. 公共库函数使用真实能力分类 + 实际脚本名称 + 具体功能，例如 `Common_*`、`Action_*`、`Input_*`、`File_*`。
+6. 不允许因为业务目录名而人为增加 `SHIFT_`、`WQFFF_` 等函数前缀。
+7. 先判断公共库是否已有能力。
+8. 有则直接调用。
+9. 没有且属于当前脚本专用动作，则写入当前脚本 Action。
+10. 由 Process 负责流程组合。
+11. MAIN 负责入口。
+12. 状态优先保持在函数局部。
+13. 优先使用参数和返回值传递数据。
+14. 禁止使用无法判断归属的裸函数名，例如 `Start()`、`Stop()`、`Exit()`、`Gui()`、`Message()`。
+15. 不为了调用方便制造全局变量。
+16. 公共函数增加一条“作用 + 参数”源码注释。
+17. 在公共库函数总文档中同步真实函数说明。
+18. 修改已有函数名称后，必须同步检查所有定义、调用、注释和文档。
