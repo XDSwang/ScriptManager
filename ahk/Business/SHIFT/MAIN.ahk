@@ -3,7 +3,10 @@
 #UseHook
 
 #Include ../../Lib/Common/GUI.ahk
+#Include ../../Lib/Common/Message.ahk
 #Include ../../Lib/Common/Release.ahk
+#Include Task_Action.ahk
+#Include Task_Process.ahk
 
 myGui := GLGui.Create("Shift 控制")
 text := myGui.AddText("w280 Center", "● 待机 | F6 开启")
@@ -11,23 +14,19 @@ text := myGui.AddText("w280 Center", "● 待机 | F6 开启")
 running := false
 
 glFile := A_ScriptDir "\" A_ScriptName ".txt"
-if FileExist(glFile)
-    FileDelete(glFile)
-FileAppend(myGui.Hwnd, glFile)
+SHIFT_WriteHwnd()
 
 *F6::
 {
-    global running
-    running := true
-    Send("{Shift down}")
+    global text
+    SHIFT_Start()
     text.Text := "● 运行中 | Shift 按住"
 }
 
 *F7::
 {
-    global running
-    ReleaseShift()
-    running := false
+    global text
+    SHIFT_Stop()
     text.Text := "● 待机 | F6 开启"
 }
 
