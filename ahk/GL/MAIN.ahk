@@ -4,6 +4,7 @@
 
 #Include ../Lib/Common/GUI.ahk
 #Include ../Lib/Common/Message.ahk
+#Include ../Lib/Common/Log.ahk
 #Include GL_Config.ahk
 #Include GL_Process.ahk
 #Include GL_Action.ahk
@@ -17,6 +18,7 @@ GL_Main(glMainScriptFolder) {
 
     Hotkey("^Up", (*) => GL_SwitchScript(1, glMainScripts, &glMainCurrentIndex, glMainManagerGuiState))
     Hotkey("^Down", (*) => GL_SwitchScript(-1, glMainScripts, &glMainCurrentIndex, glMainManagerGuiState))
+    Hotkey("F8", (*) => GL_ExitManager(glMainScripts, glMainCurrentIndex))
 }
 
 GL_Main(GL_GetManagedFolder())
