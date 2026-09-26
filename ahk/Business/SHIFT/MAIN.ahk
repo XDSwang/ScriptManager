@@ -7,36 +7,18 @@
 #Include Task_Action.ahk
 #Include Task_Process.ahk
 
-myGui := GLGui.Create("Shift 控制", 300, 35, 0, 0)
-statusText := myGui.AddText("x10 y7 w280 h20 Center", "● 待机 | F6 开启")
+SHIFT_Main() {
+    shiftMainGui := GLGui.Create("Shift 控制", 300, 35, 0, 0)
+    shiftMainStatusText := shiftMainGui.AddText("x10 y7 w280 h20 Center", "● 待机 | F6 开启")
+    shiftMainHeld := false
+    shiftMainHwndFile := A_ScriptDir "\" A_ScriptName ".txt"
 
-shiftHeld := false
+    SHIFT_WriteHwnd(shiftMainHwndFile, shiftMainGui)
 
-glFile := A_ScriptDir "\" A_ScriptName ".txt"
-SHIFT_WriteHwnd()
-
-*F6::
-{
-    SHIFT_Start()
+    Hotkey("*F6", (*) => SHIFT_Start(&shiftMainHeld, shiftMainStatusText))
+    Hotkey("*F7", (*) => SHIFT_Stop(&shiftMainHeld, shiftMainStatusText))
+    OnMessage(0xB001, (*) => SHIFT_Exit(shiftMainHwndFile, &shiftMainHeld))
+    OnExit((*) => SHIFT_ReleaseKeys(&shiftMainHeld))
 }
 
-*F7::
-{
-    SHIFT_Stop()
-}
-
-OnMessage(0xB001, GL_Exit)
-OnExit(SHIFT_ReleaseKeys)
-
-GL_Exit(*)
-{
-    global glFile
-
-    SHIFT_ReleaseKeys()
-
-    if FileExist(glFile)
-        FileDelete(glFile)
-
-    Sleep 100
-    ExitApp
-}
+SHIFT_Main()
