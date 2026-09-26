@@ -12,7 +12,8 @@ SHIFT_UpdateStatus(shiftUpdateStatusText, shiftUpdateStatusValue) {
     shiftUpdateStatusText.Text := shiftUpdateStatusValue
 }
 
-SHIFT_ReleaseKeys(&shiftReleaseHeld) {
+SHIFT_ReleaseKeys(&shiftReleaseHeld, shiftReleaseInputGuard) {
+    Input_StopGuard(shiftReleaseInputGuard)
     SendEvent "{LShift up}"
     shiftReleaseHeld := false
 }
