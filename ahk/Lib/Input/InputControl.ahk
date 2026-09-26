@@ -75,11 +75,15 @@ Input_CapturePhysicalKeys() {
 ; Input_FindNewPhysicalInput - 找出启动快照之后新增的物理输入。
 Input_FindNewPhysicalInput(inputFindNewPhysicalInputBaseline) {
     inputFindNewPhysicalInputCurrent := Input_CapturePhysicalKeys()
+    inputFindNewPhysicalInputReleasedKeys := []
 
     for inputFindNewPhysicalInputKey in inputFindNewPhysicalInputBaseline {
         if !inputFindNewPhysicalInputCurrent.Has(inputFindNewPhysicalInputKey)
-            inputFindNewPhysicalInputBaseline.Delete(inputFindNewPhysicalInputKey)
+            inputFindNewPhysicalInputReleasedKeys.Push(inputFindNewPhysicalInputKey)
     }
+
+    for inputFindNewPhysicalInputKey in inputFindNewPhysicalInputReleasedKeys
+        inputFindNewPhysicalInputBaseline.Delete(inputFindNewPhysicalInputKey)
 
     for inputFindNewPhysicalInputKey in inputFindNewPhysicalInputCurrent {
         if !inputFindNewPhysicalInputBaseline.Has(inputFindNewPhysicalInputKey)
