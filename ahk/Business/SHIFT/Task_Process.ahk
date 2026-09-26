@@ -3,9 +3,7 @@
 SHIFT_Start() {
     global shiftHeld
 
-    if shiftHeld
-        return
-
+    ; 每次 F6 都按当前状态重新建立运行态。
     SHIFT_Down()
     shiftHeld := true
     SHIFT_UpdateStatus("运行-Shift按住中/释放-按F7暂停")
@@ -14,9 +12,7 @@ SHIFT_Start() {
 SHIFT_Stop() {
     global shiftHeld
 
-    if !shiftHeld
-        return
-
+    ; F7 无条件释放 Shift，避免残留状态影响下一次 F6。
     SHIFT_Up()
     shiftHeld := false
     SHIFT_UpdateStatus("● 待机 | F6 开启")
