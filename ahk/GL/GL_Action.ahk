@@ -20,6 +20,18 @@ GL_SwitchScript(step) {
     GL_Refresh()
 }
 
+GL_StartFirst() {
+    global scripts, current
+
+    if scripts.Length = 0
+        return
+
+    current := 1
+    Run scripts[current]
+    Sleep 100
+    GL_Refresh()
+}
+
 GL_StopCurrent() {
     global scripts, current
 
