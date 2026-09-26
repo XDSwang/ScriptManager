@@ -6,7 +6,7 @@ WQFFF_Start(&wqfffStartRunning, wqfffStartFInterval, wqfffStartPressTimer, wqfff
 
     Input_StartGuard(
         wqfffStartInputGuard,
-        (*) => WQFFF_PauseForInput(&wqfffStartRunning, &wqfffStartPressTimer, wqfffStartStatusText),
+        (*) => WQFFF_PauseForInput(&wqfffStartRunning, wqfffStartPressTimer, wqfffStartStatusText),
         (*) => WQFFF_Start(&wqfffStartRunning, wqfffStartFInterval, wqfffStartPressTimer, wqfffStartStatusText, wqfffStartInputGuard)
     )
 
