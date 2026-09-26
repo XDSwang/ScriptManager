@@ -13,7 +13,7 @@ GL_SwitchScript(glSwitchStep, glSwitchScripts, &glSwitchCurrentIndex, glSwitchMa
     if glSwitchCurrentIndex > glSwitchScripts.Length
         glSwitchCurrentIndex := 1
 
-    Run glSwitchScripts[glSwitchCurrentIndex]
+    Run(glSwitchScripts[glSwitchCurrentIndex].path)
     Sleep 100
     GL_Refresh(glSwitchManagerGuiState, glSwitchScripts, glSwitchCurrentIndex)
 }
@@ -23,13 +23,13 @@ GL_StartFirst(glStartScripts, &glStartCurrentIndex, glStartManagerGuiState) {
         return
 
     glStartCurrentIndex := 1
-    Run glStartScripts[glStartCurrentIndex]
+    Run(glStartScripts[glStartCurrentIndex].path)
     Sleep 100
     GL_Refresh(glStartManagerGuiState, glStartScripts, glStartCurrentIndex)
 }
 
 GL_StopCurrent(glStopScripts, glStopCurrentIndex) {
-    SplitPath glStopScripts[glStopCurrentIndex], &glStopFileName, &glStopDir
+    SplitPath glStopScripts[glStopCurrentIndex].path, &glStopFileName, &glStopDir
     glStopHwndFile := glStopDir "\" glStopFileName ".txt"
 
     SendEvent "{F7}"
