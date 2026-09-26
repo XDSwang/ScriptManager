@@ -1,7 +1,7 @@
 # AutoHotkey v2 通用项目开发规范
 
 > 本规范从本项目已经验证的公共库、函数组织方式、变量规则、运行流程和实际问题中提炼。
-> 目标不是规定某一个具体脚本的业务，而是形成可复用于后续 AutoHotkey v2 自动化项目的通用开发标准。
+> 目标不是规定某一个具体脚本的业务，而是形成可复用于后续 AutoHotkey v2 自动化项目的通用开发标准。本项目具体目录、脚本和公共库命名，以仓库内的 `ahk/AHK项目规范.md` 为最终落地规范。
 >
 > 项目如果另有更高层级的特殊规范，应在此基础上扩展；不得无理由破坏本规范的作用域、模块职责和数据流原则。
 
@@ -100,15 +100,15 @@ MAIN 只负责入口相关工作：
 示例：
 
 ```ahk
-Script_Main() {
+MAIN() {
     scriptMainState := Script_CreateState()
 
-    Hotkey("*F6", (*) => Script_Start(&scriptMainState))
-    Hotkey("*F7", (*) => Script_Stop(&scriptMainState))
+    Hotkey("*F6", (*) => Task_Process_Start(&scriptMainState))
+    Hotkey("*F7", (*) => Task_Process_Stop(&scriptMainState))
 }
 ```
 
-MAIN 不应堆积大量业务流程。
+命名原则：同一业务目录内的入口脚本通常使用 `MAIN()`；同一目录内其他脚本使用“脚本名称 + 具体功能”，例如 `Task_Process_Start()`、`Task_Action_Down()`。目录名称已经是第一层命名空间，不需要重复拼入同目录函数名。跨目录复用能力应优先提取到 `Lib/`，公共函数使用“分类 + 具体脚本/模块 + 具体功能”，例如 `Input_InputControl_KeyDown()`。
 
 ---
 
@@ -149,7 +149,7 @@ Action 不负责决定完整业务流程。
 例如：
 
 ```ahk
-GAME_Down() {
+Task_Action_Down() {
     SendEvent "{w down}"
     SendEvent "{q down}"
 }
@@ -383,7 +383,7 @@ FunctionName(functionNameParam1, functionNameParam2) {
 详细说明统一放在：
 
 ```text
-Lib/公共库函数使用文档.md
+ahk/Lib/公共库函数使用文档.md
 ```
 
 公共函数源码与文档必须保持一致。
@@ -398,7 +398,7 @@ Lib/公共库函数使用文档.md
 
 典型能力：
 
-### GLGui.Create
+### Common_GUI_Create
 
 用途：
 
@@ -426,7 +426,7 @@ Lib/公共库函数使用文档.md
 
 ---
 
-### GLGui.UpdateList
+### Common_GUI_UpdateList
 
 用途：
 
@@ -475,7 +475,7 @@ SendExitMessage(hwnd, reason)
 统一日志函数：
 
 ```text
-GL_LogError(reason, detail)
+Common_Log_Error(reason, detail)
 ```
 
 原则：
@@ -499,10 +499,10 @@ yyyy-MM-dd HH:mm:ss | ERROR | reason | detail
 标准文件能力：
 
 ```text
-File_Exists(path)
-File_Read(path)
-File_Write(path, data)
-File_Delete(path)
+File_FileControl_Exists(path)
+File_FileControl_Read(path)
+File_FileControl_Write(path, data)
+File_FileControl_Delete(path)
 ```
 
 职责：
@@ -521,8 +521,8 @@ File_Delete(path)
 标准能力：
 
 ```text
-Timer_Start(callback, interval)
-Timer_Stop(callback)
+Action_Timer_Start(callback, interval)
+Action_Timer_Stop(callback)
 ```
 
 Process 决定：
@@ -540,8 +540,8 @@ Process 决定：
 标准能力：
 
 ```text
-GL_WindowActivate(hwnd)
-GL_WindowExists(hwnd)
+Action_Window_Activate(hwnd)
+Action_Window_Exists(hwnd)
 ```
 
 公共窗口库负责窗口能力。
@@ -559,8 +559,8 @@ GL_WindowExists(hwnd)
 基础能力：
 
 ```text
-KeyDown(key)
-KeyUp(key)
+Action_Keyboard_KeyDown(key)
+Action_Keyboard_KeyUp(key)
 ```
 
 公共键盘库只负责基础输入动作。
@@ -626,7 +626,7 @@ GetKeyState(key, "P")
 
 ```ahk
 mainControlKeys := ["F6", "F7"]
-inputGuard := Input_CreateGuard(mainControlKeys)
+inputGuard := Input_InputControl_CreateGuard(mainControlKeys)
 ```
 
 控制键会被输入保护忽略。
