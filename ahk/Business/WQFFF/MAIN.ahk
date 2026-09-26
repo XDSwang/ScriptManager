@@ -12,7 +12,6 @@ statusText := myGui.AddText("x10 y7 w280 h20 Center", "● 待机 | F6 开启")
 
 running := false
 fInterval := 100
-PressFTimer := WQFFF_PressFTimer.Bind()
 
 glFile := A_ScriptDir "\" A_ScriptName ".txt"
 WQFFF_WriteHwnd()
@@ -32,9 +31,9 @@ OnExit(WQFFF_ReleaseKeys)
 
 WQFFF_ReleaseKeys(*)
 {
-    global running, PressFTimer
+    global running
 
-    SetTimer(PressFTimer, 0)
+    SetTimer(WQFFF_PressFTimer, 0)
     SendEvent "{w up}"
     SendEvent "{q up}"
     SendEvent "{f up}"
