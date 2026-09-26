@@ -2,8 +2,6 @@
 ; AutoHotkey v2
 
 class GLGui {
-    static _controls := Map()
-
     ; Create - 创建统一的置顶、黑底、透明GUI；参数：title=标题，width=宽度，height=高度，x/y=可选位置。
     static Create(glGuiCreateTitle := "", glGuiCreateWidth := 300, glGuiCreateHeight := 35, glGuiCreateX := unset, glGuiCreateY := unset) {
         glGuiCreateGuiObj := Gui("+AlwaysOnTop", glGuiCreateTitle)
@@ -16,18 +14,16 @@ class GLGui {
             glGuiCreateGuiObj.Show("w" glGuiCreateWidth " h" glGuiCreateHeight)
 
         WinSetTransparent(220, glGuiCreateGuiObj)
-        return glGuiCreateGuiObj
+        return {gui: glGuiCreateGuiObj, controls: []}
     }
 
-    ; UpdateList - 更新脚本名称列表和当前项颜色；参数：guiObj=GUI对象，scripts=脚本路径数组，currentIndex=当前索引。
-    static UpdateList(glGuiUpdateListGuiObj, glGuiUpdateListScripts, glGuiUpdateListCurrentIndex) {
-        if !glGuiUpdateListGuiObj
+    ; UpdateList - 更新脚本名称列表和当前项颜色；参数：guiState=GLGui.Create返回对象，scripts=脚本路径数组，currentIndex=当前索引。
+    static UpdateList(glGuiUpdateListState, glGuiUpdateListScripts, glGuiUpdateListCurrentIndex) {
+        if !glGuiUpdateListState
             return 0
 
-        if !GLGui._controls.Has(glGuiUpdateListGuiObj.Hwnd)
-            GLGui._controls[glGuiUpdateListGuiObj.Hwnd] := []
-
-        glGuiUpdateListControls := GLGui._controls[glGuiUpdateListGuiObj.Hwnd]
+        glGuiUpdateListGuiObj := glGuiUpdateListState.gui
+        glGuiUpdateListControls := glGuiUpdateListState.controls
         glGuiUpdateListX := 8
         glGuiUpdateListY := 9
 
@@ -56,6 +52,6 @@ class GLGui {
             glGuiUpdateListControls[glGuiUpdateListHiddenIndex].Visible := false
         }
 
-        return glGuiUpdateListGuiObj
+        return glGuiUpdateListState
     }
 }
