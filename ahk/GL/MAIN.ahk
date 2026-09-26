@@ -19,7 +19,8 @@ GL_Main(glMainScriptFolder) {
     ; GL 切换热键必须使用 *^：子脚本可能持续物理/模拟按住 Shift、Ctrl、Alt 或 Win，* 可确保 Ctrl+方向键不因额外修饰键而失效。
     Hotkey("*^Up", (*) => GL_SwitchScript(1, glMainScripts, &glMainCurrentIndex, glMainManagerGuiState))
     Hotkey("*^Down", (*) => GL_SwitchScript(-1, glMainScripts, &glMainCurrentIndex, glMainManagerGuiState))
-    Hotkey("F8", (*) => GL_ExitManager(glMainScripts, glMainCurrentIndex))
+    ; GL 退出热键使用 *：即使子脚本持续按住 Shift、Ctrl、Alt 或 Win，也必须能够触发管理器退出流程。
+    Hotkey("*F8", (*) => GL_ExitManager(glMainScripts, glMainCurrentIndex))
 }
 
 GL_Main(GL_GetManagedFolder())
