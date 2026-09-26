@@ -1,25 +1,24 @@
 #Requires AutoHotkey v2.0
 
-GL_LoadScripts() {
-    global scripts, scriptFolder
-    scripts := []
+GL_LoadScripts(glLoadScriptsFolder) {
+    glLoadScriptsList := []
 
-    Loop Files scriptFolder "\*\MAIN.ahk"
-        scripts.Push(A_LoopFileFullPath)
+    Loop Files glLoadScriptsFolder "\*\MAIN.ahk"
+        glLoadScriptsList.Push(A_LoopFileFullPath)
 
-    GL_SortScripts()
+    return GL_SortScripts(glLoadScriptsList)
 }
 
-GL_SortScripts() {
-    global scripts
-
-    Loop scripts.Length {
-        Loop scripts.Length - 1 {
-            if (scripts[A_Index] > scripts[A_Index + 1]) {
-                temp := scripts[A_Index]
-                scripts[A_Index] := scripts[A_Index + 1]
-                scripts[A_Index + 1] := temp
+GL_SortScripts(glSortScriptsList) {
+    Loop glSortScriptsList.Length {
+        Loop glSortScriptsList.Length - 1 {
+            if (glSortScriptsList[A_Index] > glSortScriptsList[A_Index + 1]) {
+                glSortScriptsTemp := glSortScriptsList[A_Index]
+                glSortScriptsList[A_Index] := glSortScriptsList[A_Index + 1]
+                glSortScriptsList[A_Index + 1] := glSortScriptsTemp
             }
         }
     }
+
+    return glSortScriptsList
 }
