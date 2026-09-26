@@ -137,196 +137,78 @@ Action / 公共库
 不要通过隐藏的全局变量或共享脚本变量传递状态。
 
 ### 3.5 ★ 全项目函数命名原则
+**函数名称必须表达“归属来源 + 具体功能”，归属来源必须取自实际承载函数的 `.ahk` 文件名称。**
 
-**命名规则分为两级：业务/脚本函数与公共库函数必须分别明确归属。公共库函数的命名规则优先级高于旧的通用“模块 + 功能”写法。**
+这里的“具体脚本名称”指**实际 `.ahk` 文件名（不含扩展名）**，不能把上级分类目录名当成脚本名称。
 
-#### ★ 3.5.1 公共库函数/类：最高优先级规则
+#### ★ 3.5.1 公共库函数/类
+公共库函数/类采用：
 
-**公共库函数/类统一采用：**
-
-```text
 Common_具体脚本名称_具体功能
-```
 
-这里的 `具体脚本名称` 是一个**完整、不可拆分的语义单元**，必须直接对应该公共库源码所属的具体脚本/能力文件名称。
+其中：
+- Common_：表示公共库能力。
+- 具体脚本名称：必须是实际 `.ahk` 文件名，不是上级目录名。
+- 具体功能：描述函数实际完成的能力。
+
+**目录名只负责分类，不参与替代实际脚本名称。**
 
 例如：
+- Lib/Common/GUI.ahk → Common_GUI_Create()
+- Lib/Common/Message.ahk → Common_Message_SendExit()
+- Lib/Common/Log.ahk → Common_Log_Error()
+- Lib/Input/InputControl.ahk → Common_InputControl_CreateGuard()
+- Lib/Action/Keyboard.ahk → **Action_Keyboard_KeyDown()**、**Action_Keyboard_KeyUp()**
+- Lib/Action/Timer.ahk → Action_Timer_Start()、Action_Timer_Stop()
+- Lib/Action/Window.ahk → Action_Window_Activate()、Action_Window_Exists()
+- Lib/File/FileControl.ahk → **File_FileControl_Exists()**、**File_FileControl_Read()**、**File_FileControl_Write()**、**File_FileControl_Delete()**
 
-```text
-Lib/Common/GUI.ahk
-→ Common_GUI_...
+> 注意：Action、File、Input 是公共库分类目录；Keyboard、Timer、Window、FileControl、InputControl 才是实际脚本名称。
 
-Lib/Common/Message.ahk
-→ Common_Message_...
+#### ★ 3.5.2 业务脚本函数/类
+业务脚本函数/类采用：
 
-Lib/Common/Log.ahk
-→ Common_Log_...
-
-Lib/Input/InputControl.ahk
-→ Common_InputControl_...
-```
-
-具体功能继续放在最后：
-
-```ahk
-Common_GUI_Create()
-Common_GUI_UpdateList()
-
-Common_Message_SendExit()
-Common_Message_GetExitReason()
-
-Common_Log_Error()
-
-Common_InputControl_CreateGuard()
-Common_InputControl_StartGuard()
-Common_InputControl_StopGuard()
-```
-
-**禁止把具体脚本名称拆开，也禁止用业务脚本名称代替公共库脚本名称。**
-
-例如，如果函数来自 `GUI.ahk`，不能为了表示“服务 GL”而命名成：
-
-```text
-Common_GL_Gui
-```
-
-因为 `GL` 是业务脚本名称，而 `GUI` 才是这个公共库的真实具体脚本名称。
-
-同理：
-
-```text
-Common_Message_...
-Common_Log_...
-Common_InputControl_...
-```
-
-中的 `Message`、`Log`、`InputControl` 都必须作为完整脚本名称保留。
-
-#### ★ 3.5.2 业务脚本函数
-
-业务脚本使用：
-
-```text
 具体脚本名称_具体功能
-```
 
 例如：
+- GL 管理脚本：GL_Main()、GL_SwitchScript()、GL_StopCurrent()
+- SHIFT 子脚本：SHIFT_Main()、SHIFT_Start()、SHIFT_Stop()
+- WQFFF 子脚本：WQFFF_Main()、WQFFF_Start()、WQFFF_Stop()
 
-```ahk
-WQFFF_Start()
-WQFFF_Stop()
-WQFFF_Exit()
+禁止：Main()、Start()、Stop()、Update()、Exit() 等无法表达归属的裸名称。
 
-SHIFT_Start()
-SHIFT_Stop()
-SHIFT_Exit()
+#### ★ 3.5.3 目录名与脚本名必须严格区分
+目录 = 分类
+文件 = 实际脚本/模块
+函数名 = 来源 + 功能
 
-GL_StartFirst()
-GL_SwitchScript()
-GL_ExitManager()
-```
+例如 Lib/Action/Keyboard.ahk：
+- Action 是分类目录。
+- Keyboard 是实际脚本名称。
+- 函数应体现 Keyboard 的来源。
 
-业务名称本身也是一个完整语义单元：
+因此使用 Action_Keyboard_KeyDown()，而不是 Common_Keyboard_KeyDown() 或 Keyboard_KeyDown()。
 
-```text
-WQFFF
-SHIFT
-GL
-```
+例如 Lib/File/FileControl.ahk：
+- File 是分类目录。
+- FileControl 是实际脚本名称。
+- 因此使用 File_FileControl_Read()。
 
-不能为了凑命名层级而拆分。
+#### ★ 3.5.4 核心原则
+1. 先确定实际承载函数的 `.ahk` 文件。
+2. 再确定该文件所属分类。
+3. 使用对应分类前缀 + 实际脚本名称 + 功能名称。
+4. 分类目录名不能代替实际脚本名。
+5. 不允许省略实际脚本名。
+6. 不允许人为拆分真实脚本名称。
+7. 不允许使用无法判断归属的裸函数名。
 
-#### 3.5.3 Process 与 Action 也必须遵守
-
-文件职责可以继续区分：
-
-```text
-Task_Process.ahk
-Task_Action.ahk
-```
-
-但函数名称不能依赖文件名来区分归属。
-
-例如 WQFFF：
-
-```text
-Task_Process.ahk
-→ WQFFF_Start()
-→ WQFFF_Stop()
-→ WQFFF_Exit()
-
-Task_Action.ahk
-→ WQFFF_Down()
-→ WQFFF_Up()
-→ WQFFF_PressF()
-→ WQFFF_ReleaseKeys()
-```
-
-#### 3.5.4 为什么必须这样命名
-
-项目会不断增加业务脚本和公共能力。
-
-如果使用：
-
-```text
-Start()
-Stop()
-Exit()
-Update()
-Init()
-Process()
-Action()
-ReleaseKeys()
-```
-
-那么随着 `#Include` 数量增加，会产生：
-
-- 无法从调用处立即判断归属。
-- 新增脚本时容易出现同名函数。
-- 不同模块之间容易发生命名冲突。
-- 阅读调用链时需要额外搜索定义。
-- 代码复制、拆分、合并时更容易发生冲突。
-
-因此，**名称本身必须携带真实归属信息。**
-
-对于公共库：
-
-```text
-Common_具体脚本名称_具体功能
-```
-
-对于业务：
-
-```text
-具体脚本名称_具体功能
-```
-
-#### 3.5.5 新增扩展时的命名优先级
-
-以后新增任何脚本、业务目录、功能目录或公共能力时：
-
-1. **先确定具体脚本名称。**
-2. 如果属于公共库，函数/类名称必须使用 `Common_具体脚本名称_具体功能`。
-3. 如果属于业务脚本，函数/类名称必须使用 `具体脚本名称_具体功能`。
-4. 具体脚本名称必须保持完整，不得人为拆分。
-5. 后面的部分再描述实际功能。
-6. 不因为函数简单就省略归属前缀。
-7. 不因为当前没有重名就省略前缀。
-8. 不使用 `Start()`、`Stop()`、`Gui()`、`Message()`、`LogError()` 等无归属名称。
-
-核心原则：
-
-> **先确定真实具体脚本名称，再确定功能名称；公共库必须增加 Common_ 来源标记。**
-
-因此：
-
-```text
-公共库函数/类：
-Common_具体脚本名称_具体功能
-
-业务函数/类：
-具体脚本名称_具体功能
-```
+#### ★ 3.5.5 新增模块命名顺序
+1. 判断属于公共库还是业务脚本。
+2. 确定实际承载函数的 `.ahk` 文件。
+3. 确定该文件所属分类目录。
+4. 按上述规则命名。
+5. 同步更新公共库函数文档。
 
 ### 3.6 变量与函数命名的共同原则
 
