@@ -107,7 +107,7 @@ GL_Action_ExitManager(glExitManagerScripts, glExitManagerCurrentIndex) {
 }
 
 GL_Action_Show() {
-    return Common_GUI_Create("GL管理器", 300, 35)
+    return Common_GUI_Create("GL管理器/F8全退", 300, 35)
 }
 
 ; ★ 每次启动/切换后刷新管理器 GUI；当前索引由 GUI 公共库显示为红色。
